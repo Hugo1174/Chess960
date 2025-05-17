@@ -9,15 +9,19 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    clickablelabel.cpp \
     gamewindow.cpp \
     guidewindow.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    piece_logic.cpp
 
 HEADERS += \
+    clickablelabel.h \
     gamewindow.h \
     guidewindow.h \
-    mainwindow.h
+    mainwindow.h \
+    piece_logic.h
 
 FORMS += \
     gamewindow.ui \

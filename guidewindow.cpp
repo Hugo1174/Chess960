@@ -6,6 +6,7 @@ guidewindow::guidewindow(QWidget *parent)
     , ui(new Ui::guidewindow)
 {
     ui->setupUi(this);
+    setWindowTitle("Chess960 - Гайд");
 }
 
 guidewindow::~guidewindow()

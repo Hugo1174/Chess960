@@ -30,9 +30,11 @@ private slots:
 
     void on_pushButton_guide_clicked();
 
+    void on_pushButton_exit_clicked();
+
 private:
     Ui::MainWindow *ui;
-    guidewindow *guide_w;
+    guidewindow* guide_w = nullptr;
     gamewindow *game_w;
 
 };

@@ -1,4 +1,7 @@
 #include "gamewindow.h"
+#include "piece_logic.h"
+#include "clickablelabel.h"
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -61,71 +64,8 @@ QString generateChess960Position()
     return QString(pos.data(), pos.size());
 }
 
-void gamewindow::setupChess960Position()
-{
-    QString position = generateChess960Position();
-
-    // Пути к ресурсам фигур (проверьте соответствие с вашим .qrc)
-    QMap<QChar, QString> whitePieces {
-        {'K', ":/new/prefix1/pieces600/wk.png"},
-        {'Q', ":/new/prefix1/pieces600/wq.png"},
-        {'R', ":/new/prefix1/pieces600/wr.png"},
-        {'B', ":/new/prefix1/pieces600/wb.png"},
-        {'N', ":/new/prefix1/pieces600/wn.png"}
-    };
-    QMap<QChar, QString> blackPieces {
-        {'K', ":/new/prefix1/pieces600/bk.png"},
-        {'Q', ":/new/prefix1/pieces600/bq.png"},
-        {'R', ":/new/prefix1/pieces600/br.png"},
-        {'B', ":/new/prefix1/pieces600/bb.png"},
-        {'N', ":/new/prefix1/pieces600/bn.png"}
-    };
-
-    // Очищаем доску
-    for (int row = 0; row < 8; ++row) {
-        for (int col = 0; col < 8; ++col) {
-            boardCells[row][col]->clear();
-        }
-    }
-
-    // Расставляем белые фигуры на 1-й горизонтали (индекс 7)
-    int whiteRow = 7;
-    for (int col = 0; col < 8; ++col) {
-        QChar piece = position[col];
-        if (whitePieces.contains(piece)) {
-            QPixmap pixmap(whitePieces[piece]);
-            boardCells[whiteRow][col]->setPixmap(pixmap.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        }
-    }
-
-    // Пешки белых на 2-й горизонтали (индекс 6)
-    int whitePawnRow = 6;
-    QPixmap wpix(":/new/prefix1/pieces600/wp.png");
-    for (int col = 0; col < 8; ++col) {
-        boardCells[whitePawnRow][col]->setPixmap(wpix.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
-
-    // Черные фигуры зеркально на 8-й горизонтали (индекс 0)
-    int blackRow = 0;
-    for (int col = 0; col < 8; ++col) {
-        QChar piece = position[col];
-        if (blackPieces.contains(piece)) {
-            QPixmap pixmap(blackPieces[piece]);
-            boardCells[blackRow][col]->setPixmap(pixmap.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-        }
-    }
-
-    // Пешки черных на 7-й горизонтали (индекс 1)
-    int blackPawnRow = 1;
-    QPixmap bpix(":/new/prefix1/pieces600/bp.png");
-    for (int col = 0; col < 8; ++col) {
-        boardCells[blackPawnRow][col]->setPixmap(bpix.scaled(90, 90, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    }
-}
-
-gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent)
-{
-    setWindowTitle("Chess960 - Игровое Окно");
+gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent) {
+    setWindowTitle("Chess960 - Игра");
     setMinimumSize(1280, 720);
 
     centralWidget = new QWidget(this);
@@ -133,14 +73,15 @@ gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent)
 
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
 
+    // Панель съеденных фигур
     QVBoxLayout *capturedPiecesPanel = new QVBoxLayout();
     capturedPiecesPanel->setSpacing(0);
 
-    QLabel *whiteCapturedPieces = new QLabel("Съеденные фигуры (Белые)");
-    whiteCapturedPieces->setFixedHeight(100);
-    whiteCapturedPieces->setMinimumWidth(200);
-    whiteCapturedPieces->setMaximumWidth(250);
-    capturedPiecesPanel->addWidget(whiteCapturedPieces);
+    topCapturedPieces = new QLabel("Съеденные фигуры (Белые)");
+    topCapturedPieces->setFixedHeight(100);
+    topCapturedPieces->setMinimumWidth(200);
+    topCapturedPieces->setMaximumWidth(250);
+    capturedPiecesPanel->addWidget(topCapturedPieces);
 
     QFrame *divider = new QFrame();
     divider->setFrameShape(QFrame::HLine);
@@ -149,27 +90,32 @@ gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent)
     divider->setStyleSheet("background-color: green;");
     capturedPiecesPanel->addWidget(divider);
 
-    QLabel *blackCapturedPieces = new QLabel("Съеденные фигуры (Черные)");
-    blackCapturedPieces->setFixedHeight(100);
-    blackCapturedPieces->setMinimumWidth(200);
-    blackCapturedPieces->setMaximumWidth(250);
-    capturedPiecesPanel->addWidget(blackCapturedPieces);
+    bottomCapturedPieces = new QLabel("Съеденные фигуры (Черные)");
+    bottomCapturedPieces->setFixedHeight(100);
+    bottomCapturedPieces->setMinimumWidth(200);
+    bottomCapturedPieces->setMaximumWidth(250);
+    capturedPiecesPanel->addWidget(bottomCapturedPieces);
 
     mainLayout->addLayout(capturedPiecesPanel);
 
+    // Контейнер для шахматной доски
     QWidget *boardContainer = new QWidget();
     boardContainer->setFixedSize(720, 720);
     QGridLayout *boardLayout = new QGridLayout(boardContainer);
     boardLayout->setSpacing(0);
     boardLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Создание клеток доски и сохранение в член класса boardCells
+    // Создание клеток доски
     for (int row = 0; row < 8; ++row) {
         for (int col = 0; col < 8; ++col) {
-            QLabel *cell = new QLabel();
+            ClickableLabel *cell = new ClickableLabel();
             cell->setFixedSize(90, 90);
             cell->setAlignment(Qt::AlignCenter);
+            cell->row = row;
+            cell->col = col;
+            connect(cell, &ClickableLabel::clicked, this, &gamewindow::handleCellClick);
 
+            // Раскраска клеток
             if ((row + col) % 2 == 0) {
                 cell->setStyleSheet("background-color: #f0d9b5; border: 0px;");
             } else {
@@ -181,60 +127,9 @@ gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent)
         }
     }
 
-    QWidget *wrapper = new QWidget();
-    QGridLayout *wrapperLayout = new QGridLayout(wrapper);
-    wrapperLayout->setContentsMargins(0, 0, 0, 0);
-    wrapperLayout->setSpacing(0);
+    mainLayout->addWidget(boardContainer);
 
-    wrapperLayout->addWidget(boardContainer, 1, 1);
-
-    QHBoxLayout *topLabels = new QHBoxLayout();
-    topLabels->setSpacing(0);
-    topLabels->setContentsMargins(0, 0, 0, 0);
-    QString letters = "ABCDEFGH";
-    for (int i = 0; i < 8; ++i) {
-        QLabel *label = new QLabel(QString(letters[i]));
-        label->setFixedSize(90, 20);
-        label->setAlignment(Qt::AlignCenter);
-        topLabels->addWidget(label);
-    }
-    wrapperLayout->addLayout(topLabels, 0, 1);
-
-    QHBoxLayout *bottomLabels = new QHBoxLayout();
-    bottomLabels->setSpacing(0);
-    bottomLabels->setContentsMargins(0, 0, 0, 0);
-    for (int i = 0; i < 8; ++i) {
-        QLabel *label = new QLabel(QString(letters[i]));
-        label->setFixedSize(90, 20);
-        label->setAlignment(Qt::AlignCenter);
-        bottomLabels->addWidget(label);
-    }
-    wrapperLayout->addLayout(bottomLabels, 2, 1);
-
-    QVBoxLayout *leftLabels = new QVBoxLayout();
-    leftLabels->setSpacing(0);
-    leftLabels->setContentsMargins(0, 0, 0, 0);
-    for (int i = 0; i < 8; ++i) {
-        QLabel *label = new QLabel(QString::number(8 - i));
-        label->setFixedSize(20, 90);
-        label->setAlignment(Qt::AlignCenter);
-        leftLabels->addWidget(label);
-    }
-    wrapperLayout->addLayout(leftLabels, 1, 0);
-
-    QVBoxLayout *rightLabels = new QVBoxLayout();
-    rightLabels->setSpacing(0);
-    rightLabels->setContentsMargins(0, 0, 0, 0);
-    for (int i = 0; i < 8; ++i) {
-        QLabel *label = new QLabel(QString::number(8 - i));
-        label->setFixedSize(20, 90);
-        label->setAlignment(Qt::AlignCenter);
-        rightLabels->addWidget(label);
-    }
-    wrapperLayout->addLayout(rightLabels, 1, 2);
-
-    mainLayout->addWidget(wrapper);
-
+    // Поле для истории ходов
     moveHistory = new QTextEdit();
     moveHistory->setPlaceholderText("Ходы...");
     moveHistory->setReadOnly(true);
@@ -242,10 +137,142 @@ gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent)
     moveHistory->setMaximumWidth(250);
     mainLayout->addWidget(moveHistory);
 
-    // Установка фигур Chess960
+    // Устанавливаем начальную позицию
     setupChess960Position();
 }
 
-gamewindow::~gamewindow()
-{
+void gamewindow::setupChess960Position() {
+    QString position = generateChess960Position();
+
+    // Инициализация пустой доски
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            boardState[r][c] = {NONE, NO_COLOR};
+        }
+    }
+
+    // Заполнение фигур согласно позиции
+    for (int col = 0; col < 8; ++col) {
+        QChar figChar = position[col];
+        PieceType pt;
+        switch (figChar.unicode()) {
+        case 'K': pt = KING; break;
+        case 'Q': pt = QUEEN; break;
+        case 'R': pt = ROOK; break;
+        case 'B': pt = BISHOP; break;
+        case 'N': pt = KNIGHT; break;
+        default: pt = NONE; break;
+        }
+
+        boardState[7][col] = {pt, WHITE};
+        boardState[0][col] = {pt, BLACK};
+
+        boardState[6][col] = {PAWN, WHITE};
+        boardState[1][col] = {PAWN, BLACK};
+    }
+
+    updateBoardUI();
 }
+void gamewindow::clearHighlights() {
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            if ((r + c) % 2 == 0) {
+                boardCells[r][c]->setStyleSheet("background-color: #f0d9b5; border: 0px;");
+            } else {
+                boardCells[r][c]->setStyleSheet("background-color: #b58863; border: 0px;");
+            }
+        }
+    }
+}
+
+void gamewindow::highlightSelectedAndMoves(int row, int col) {
+    clearHighlights();
+
+    // Подсветка выбранной клетки (светлее)
+    boardCells[row][col]->setStyleSheet("background-color: #f7f3d3; border: 2px solid yellow;");
+
+    // Подсвечиваем возможные ходы зелёным
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            Move move{row, col, r, c};
+            if (isValidMove(boardState, move, currentTurn)) {
+                // Подсвечиваем клетку зеленым, если она не выбранная
+                if (!(r == row && c == col)) {
+                    boardCells[r][c]->setStyleSheet("background-color: #a6f0a6; border: 2px solid green;");
+                }
+            }
+        }
+    }
+}
+
+void gamewindow::handleCellClick(int row, int col) {
+    Piece clickedPiece = boardState[row][col];
+
+    if (selectedRow == -1 && selectedCol == -1) {
+        if (clickedPiece.color == currentTurn) {
+            selectedRow = row;
+            selectedCol = col;
+            highlightSelectedAndMoves(row, col);
+        }
+        return;
+    }
+
+    if (selectedRow != -1 && selectedCol != -1) {
+        if (clickedPiece.color == currentTurn) {
+            selectedRow = row;
+            selectedCol = col;
+            highlightSelectedAndMoves(row, col);
+            return;
+        }
+
+        Move move = {selectedRow, selectedCol, row, col};
+        if (isValidMove(boardState, move, currentTurn)) {
+            boardState[row][col] = boardState[selectedRow][selectedCol];
+            boardState[selectedRow][selectedCol] = {NONE, NO_COLOR};
+            switchTurn();
+            updateBoardUI();
+        }
+
+        selectedRow = -1;
+        selectedCol = -1;
+        clearHighlights();
+    }
+}
+
+
+
+void gamewindow::switchTurn() {
+    currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+}
+
+void gamewindow::updateBoardUI() {
+    // Карта фигур к путям изображений
+    QMap<QPair<PieceColor, PieceType>, QString> pieceImages = {
+        {{WHITE, KING}, ":/new/prefix1/pieces600/wk.png"},
+        {{WHITE, QUEEN}, ":/new/prefix1/pieces600/wq.png"},
+        {{WHITE, ROOK}, ":/new/prefix1/pieces600/wr.png"},
+        {{WHITE, BISHOP}, ":/new/prefix1/pieces600/wb.png"},
+        {{WHITE, KNIGHT}, ":/new/prefix1/pieces600/wn.png"},
+        {{WHITE, PAWN}, ":/new/prefix1/pieces600/wp.png"},
+        {{BLACK, KING}, ":/new/prefix1/pieces600/bk.png"},
+        {{BLACK, QUEEN}, ":/new/prefix1/pieces600/bq.png"},
+        {{BLACK, ROOK}, ":/new/prefix1/pieces600/br.png"},
+        {{BLACK, BISHOP}, ":/new/prefix1/pieces600/bb.png"},
+        {{BLACK, KNIGHT}, ":/new/prefix1/pieces600/bn.png"},
+        {{BLACK, PAWN}, ":/new/prefix1/pieces600/bp.png"}
+    };
+
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            Piece p = boardState[row][col];
+            if (p.type == NONE) {
+                boardCells[row][col]->clear();
+            } else {
+                QString imgPath = pieceImages.value({p.color, p.type});
+                boardCells[row][col]->setPixmap(QPixmap(imgPath).scaled(90, 90));
+            }
+        }
+    }
+}
+
+gamewindow::~gamewindow() {}

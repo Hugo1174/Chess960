@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Chess960");
 }
 
 MainWindow::~MainWindow()
@@ -42,8 +44,25 @@ void MainWindow::on_pushButton_play1_clicked()
 
 void MainWindow::on_pushButton_guide_clicked()
 {
-    hide();
-    guide_w = new guidewindow(this);
-    guide_w -> show();
+    if (guide_w == nullptr) {
+        guide_w = new guidewindow(this);
+
+        // Подключаем сигнал закрытия окна, чтобы очистить указатель
+        connect(guide_w, &QWidget::destroyed, this, [this]() {
+            guide_w = nullptr;
+        });
+
+        guide_w->show();
+    } else {
+        guide_w->raise();      // Поднять окно на передний план
+        guide_w->activateWindow(); // Активировать окно
+    }
+}
+
+
+
+void MainWindow::on_pushButton_exit_clicked()
+{
+    qApp->quit();
 }
 

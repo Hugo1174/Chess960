@@ -10,12 +10,14 @@
 #define UI_GUIDEWINDOW_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextEdit>
+#include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -26,8 +28,9 @@ public:
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     QTextEdit *textEdit;
-    QMenuBar *menubar;
     QStatusBar *statusbar;
+    QToolBar *toolBar;
+    QMenuBar *menuBar;
 
     void setupUi(QMainWindow *guidewindow)
     {
@@ -44,13 +47,18 @@ public:
         gridLayout->addWidget(textEdit, 0, 0, 1, 1);
 
         guidewindow->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(guidewindow);
-        menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 800, 25));
-        guidewindow->setMenuBar(menubar);
         statusbar = new QStatusBar(guidewindow);
         statusbar->setObjectName("statusbar");
         guidewindow->setStatusBar(statusbar);
+        toolBar = new QToolBar(guidewindow);
+        toolBar->setObjectName("toolBar");
+        guidewindow->addToolBar(Qt::ToolBarArea::BottomToolBarArea, toolBar);
+        menuBar = new QMenuBar(guidewindow);
+        menuBar->setObjectName("menuBar");
+        menuBar->setGeometry(QRect(0, 0, 800, 25));
+        guidewindow->setMenuBar(menuBar);
+
+        toolBar->addSeparator();
 
         retranslateUi(guidewindow);
 
@@ -167,6 +175,7 @@ public:
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">	\320\222 \321\202\321\203\321\200\320\275\320\270\321\200\320\260\321\205 \320\263\321\200\320\276\321\201\321\201\320\274\320\265\320\271\321\201\321\202\320\265\321\200\320\276\320\262 \321\210\320\260\321\205\320\274\320\260\321\202\321\213 \320\244\320\270\321\210\320\265\321\200\320\260 \320\275\320\260\321\207\320\260\320\273\320\270 \320\272\321\203\320"
                         "\273\321\214\321\202\320\270\320\262\320\270\321\200\320\276\320\262\320\260\321\202\321\214\321\201\321\217 \320\275\320\260 \321\200\321\203\320\261\320\265\320\266\320\265 20 \320\270 21 \320\262\320\265\320\272\320\260. \320\234\320\265\321\201\321\202\320\276\320\274 \320\277\321\200\320\276\320\262\320\265\320\264\320\265\320\275\320\270\321\217 \321\202\320\260\320\272\320\270\321\205 \321\202\321\203\321\200\320\275\320\270\321\200\320\276\320\262 \321\201\321\202\320\260\320\273 \320\275\320\265\320\274\320\265\321\206\320\272\320\270\320\271 \320\263\320\276\321\200\320\276\320\264 \320\234\320\260\320\271\320\275\321\206. </span></p>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">\302\240 </span></p></body></html>", nullptr));
+        toolBar->setWindowTitle(QCoreApplication::translate("guidewindow", "toolBar", nullptr));
     } // retranslateUi
 
 };

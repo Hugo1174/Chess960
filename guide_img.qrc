@@ -6,4 +6,5 @@
         <file>guide/shahmati-fishera-turnir.jpg</file>
         <file>guide/do-rokirovki.jpg</file>
     </qresource>
+    <qresource prefix="/menu"/>
 </RCC>

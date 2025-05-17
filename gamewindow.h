@@ -1,6 +1,9 @@
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
+#include "clickablelabel.h"
+#include "piece_logic.h"
+
 #include <QMainWindow>
 #include <QWidget>
 #include <QLabel>
@@ -22,10 +25,20 @@ private:
     QLabel *bottomCapturedPieces;
     QTextEdit *moveHistory;
 
+    ClickableLabel* boardCells[8][8];
+    Piece boardState[8][8];
 
-    QLabel* boardCells[8][8];  // Массив клеток доски
+    int selectedRow = -1, selectedCol = -1;
+    PieceColor currentTurn = WHITE;
 
     void setupChess960Position();
+    void handleCellClick(int row, int col);
+    void switchTurn();
+    void updateBoardUI();
+    void highlightSelectedAndMoves(int row, int col);
+    void clearHighlights();
+
+
 };
 
 #endif // GAMEWINDOW_H
