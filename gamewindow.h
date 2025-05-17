@@ -21,7 +21,11 @@ private:
     QLabel *topCapturedPieces;
     QLabel *bottomCapturedPieces;
     QTextEdit *moveHistory;
-    QWidget *chessBoard;
+
+
+    QLabel* boardCells[8][8];  // Массив клеток доски
+
+    void setupChess960Position();
 };
 
 #endif // GAMEWINDOW_H

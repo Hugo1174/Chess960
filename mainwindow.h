@@ -21,7 +21,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_5_clicked();
 
     void on_pushButton_play2_clicked();
 

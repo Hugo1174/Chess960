@@ -350,6 +350,25 @@ release/moc_gamewindow.cpp: ../../gamewindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtCore/qlocale.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtabwidget.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QLabel \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlabel.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpicture.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextdocument.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QTextEdit \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtextedit.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextoption.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextcursor.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextformat.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpen.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
 		release/moc_predefs.h \
 		C:/Qt/6.9.0/mingw_64/bin/moc.exe
 	C:\Qt\6.9.0\mingw_64\bin\moc.exe $(DEFINES) --include D:/4_semester/course_proga/Chess960/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/release/moc_predefs.h -IC:/Qt/6.9.0/mingw_64/mkspecs/win32-g++ -ID:/4_semester/course_proga/Chess960 -IC:/Qt/6.9.0/mingw_64/include -IC:/Qt/6.9.0/mingw_64/include/QtWidgets -IC:/Qt/6.9.0/mingw_64/include/QtGui -IC:/Qt/6.9.0/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IC:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include ..\..\gamewindow.h -o release\moc_gamewindow.cpp
@@ -760,6 +779,25 @@ release/moc_mainwindow.cpp: ../../mainwindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtabwidget.h \
 		../../gamewindow.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QLabel \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlabel.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpicture.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextdocument.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QTextEdit \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtextedit.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextoption.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextcursor.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextformat.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpen.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
 		release/moc_predefs.h \
 		C:/Qt/6.9.0/mingw_64/bin/moc.exe
 	C:\Qt\6.9.0\mingw_64\bin\moc.exe $(DEFINES) --include D:/4_semester/course_proga/Chess960/build/Desktop_Qt_6_9_0_MinGW_64_bit-Debug/release/moc_predefs.h -IC:/Qt/6.9.0/mingw_64/mkspecs/win32-g++ -ID:/4_semester/course_proga/Chess960 -IC:/Qt/6.9.0/mingw_64/include -IC:/Qt/6.9.0/mingw_64/include/QtWidgets -IC:/Qt/6.9.0/mingw_64/include/QtGui -IC:/Qt/6.9.0/mingw_64/include/QtCore -I. -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++ -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32 -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/backward -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include -IC:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include-fixed -IC:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include ..\..\mainwindow.h -o release\moc_mainwindow.cpp
@@ -995,7 +1033,27 @@ release/gamewindow.o: ../../gamewindow.cpp ../../gamewindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtCore/qlocale.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtabwidget.h \
-		ui_gamewindow.h
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QLabel \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlabel.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpicture.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextdocument.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QTextEdit \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtextedit.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextoption.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextcursor.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextformat.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpen.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QHBoxLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QFrame
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\gamewindow.o ..\..\gamewindow.cpp
 
 release/guidewindow.o: ../../guidewindow.cpp ../../guidewindow.h \
@@ -1426,6 +1484,25 @@ release/main.o: ../../main.cpp ../../mainwindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtabwidget.h \
 		../../gamewindow.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QLabel \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlabel.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qframe.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpicture.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextdocument.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QTextEdit \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtextedit.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextoption.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextcursor.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextformat.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpen.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QApplication \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qapplication.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\main.o ..\..\main.cpp
@@ -1632,20 +1709,29 @@ release/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qguiapplication_platform.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtabwidget.h \
 		../../gamewindow.h \
-		ui_mainwindow.h \
-		C:/Qt/6.9.0/mingw_64/include/QtCore/QVariant \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QApplication \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qapplication.h \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QLabel \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlabel.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qframe.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qpicture.h \
 		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextdocument.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QTextEdit \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qtextedit.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractscrollarea.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextoption.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextcursor.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qtextformat.h \
+		C:/Qt/6.9.0/mingw_64/include/QtGui/qpen.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QGridLayout \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qgridlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qlayoutitem.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qboxlayout.h \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
+		ui_mainwindow.h \
+		C:/Qt/6.9.0/mingw_64/include/QtCore/QVariant \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QApplication \
+		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qapplication.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QMenuBar \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qmenubar.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qmenu.h \
@@ -1654,8 +1740,6 @@ release/mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qabstractbutton.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QStatusBar \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qstatusbar.h \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QVBoxLayout \
-		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QWidget \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/QMessageBox \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qmessagebox.h \
 		C:/Qt/6.9.0/mingw_64/include/QtWidgets/qdialog.h \
