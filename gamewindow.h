@@ -2,10 +2,11 @@
 #define GAMEWINDOW_H
 
 #include <QMainWindow>
-
-namespace Ui {
-class gamewindow;
-}
+#include <QWidget>
+#include <QLabel>
+#include <QTextEdit>
+#include <QGridLayout>
+#include <QVBoxLayout>
 
 class gamewindow : public QMainWindow
 {
@@ -16,7 +17,11 @@ public:
     ~gamewindow();
 
 private:
-    Ui::gamewindow *ui;
+    QWidget *centralWidget;
+    QLabel *topCapturedPieces;
+    QLabel *bottomCapturedPieces;
+    QTextEdit *moveHistory;
+    QWidget *chessBoard;
 };
 
 #endif // GAMEWINDOW_H
