@@ -14,14 +14,16 @@ SOURCES += \
     guidewindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    piece_logic.cpp
+    piece_logic.cpp \
+    promotiondialog.cpp
 
 HEADERS += \
     clickablelabel.h \
     gamewindow.h \
     guidewindow.h \
     mainwindow.h \
-    piece_logic.h
+    piece_logic.h \
+    promotiondialog.h
 
 FORMS += \
     gamewindow.ui \

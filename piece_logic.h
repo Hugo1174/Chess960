@@ -1,25 +1,8 @@
 #ifndef PIECE_LOGIC_H
 #define PIECE_LOGIC_H
 
-#include <QString>
-#include <QVector>
-#include <QPair>
-
-enum PieceType {
-    NONE,
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING
-};
-
-enum PieceColor {
-    NO_COLOR,
-    WHITE,
-    BLACK
-};
+enum PieceType { NONE, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
+enum PieceColor { NO_COLOR, WHITE, BLACK };
 
 struct Piece {
     PieceType type;
@@ -31,7 +14,10 @@ struct Move {
     int toRow, toCol;
 };
 
-Piece identifyPieceFromPixmapPath(const QString &path);
-bool isValidMove(const Piece board[8][8], const Move &move, PieceColor turn);
+bool isValidMove(const Piece board[8][8], Move move, PieceColor turn);
+bool isSquareAttacked(Piece board[8][8], int targetRow, int targetCol, PieceColor attackerColor);
+bool isKingInCheck(Piece board[8][8], PieceColor color);
+
+
 
 #endif // PIECE_LOGIC_H
