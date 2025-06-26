@@ -1,407 +1,315 @@
 #include "gamewindow.h"
-#include "piece_logic.h"
-#include "clickablelabel.h"
 #include "promotiondialog.h"
 
-#include<QMessageBox>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QTextEdit>
-#include <QFrame>
 #include <QGridLayout>
-#include <QWidget>
-#include <QPixmap>
-#include <QRandomGenerator>
-#include <algorithm>
+#include <QFrame>
+#include <QMessageBox>
+#include <QMap>
+#include <QFont>
 #include <QPushButton>
-#include <QAbstractButton>
 
-// Функция генерации позиции Chess960
-QString generateChess960Position() {
-    QVector<QChar> pos(8, ' ');
-
-    int bishop1 = QRandomGenerator::global()->bounded(4) * 2;
-    int bishop2 = QRandomGenerator::global()->bounded(4) * 2 + 1;
-    pos[bishop1] = 'B';
-    pos[bishop2] = 'B';
-
-    QVector<int> freePositions;
-    for (int i = 0; i < 8; ++i)
-        if (pos[i] == ' ') freePositions.append(i);
-
-    QVector<QVector<int>> rkPositions;
-    for (int i = 0; i < freePositions.size(); ++i)
-        for (int j = i + 1; j < freePositions.size(); ++j)
-            for (int k = i + 1; k < j; ++k)
-                rkPositions.append({freePositions[i], freePositions[k], freePositions[j]});
-
-    int idx = QRandomGenerator::global()->bounded(rkPositions.size());
-    int r1 = rkPositions[idx][0], k = rkPositions[idx][1], r2 = rkPositions[idx][2];
-
-    pos[r1] = 'R'; pos[k] = 'K'; pos[r2] = 'R';
-
-    QVector<int> remaining;
-    for (int i = 0; i < 8; ++i)
-        if (pos[i] == ' ') remaining.append(i);
-
-    QVector<QChar> leftovers = {'Q', 'N', 'N'};
-    std::shuffle(leftovers.begin(), leftovers.end(), *QRandomGenerator::global());
-
-    for (int i = 0; i < remaining.size(); ++i)
-        pos[remaining[i]] = leftovers[i];
-
-    return QString(pos.data(), pos.size());
-}
-
-gamewindow::gamewindow(QWidget *parent) : QMainWindow(parent) {
+gamewindow::gamewindow(QWidget *parent)
+    : QMainWindow(parent), m_logic(new PieceLogic(this))
+{
+    setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Chess960 - Игра");
     setMinimumSize(1280, 720);
-    centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
 
-    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
+    QPalette pal = palette();
+    pal.setColor(QPalette::Window, QColor(45, 45, 45));
+    setAutoFillBackground(true);
+    setPalette(pal);
 
-    QVBoxLayout *capturedPiecesPanel = new QVBoxLayout();
-    capturedPiecesPanel->setSpacing(0);
+    setupUI();
 
-    topCapturedPieces = new QLabel("Съеденные фигуры (Белые)");
-    topCapturedPieces->setFixedHeight(100);
-    capturedPiecesPanel->addWidget(topCapturedPieces);
-    whiteCapturedLayout = new QHBoxLayout();
-    capturedPiecesPanel->addLayout(whiteCapturedLayout);
-
-    QFrame *divider = new QFrame();
-    divider->setFrameShape(QFrame::HLine);
-    divider->setLineWidth(4);
-    divider->setStyleSheet("background-color: green;");
-    capturedPiecesPanel->addWidget(divider);
-
-    bottomCapturedPieces = new QLabel("Съеденные фигуры (Черные)");
-    bottomCapturedPieces->setFixedHeight(100);
-    capturedPiecesPanel->addWidget(bottomCapturedPieces);
-    blackCapturedLayout = new QHBoxLayout();
-    capturedPiecesPanel->addLayout(blackCapturedLayout);
-
-    mainLayout->addLayout(capturedPiecesPanel);
-
-    QWidget *boardContainer = new QWidget();
-    boardContainer->setFixedSize(720, 720);
-    QGridLayout *boardLayout = new QGridLayout(boardContainer);
-    boardLayout->setSpacing(0);
-    boardLayout->setContentsMargins(0, 0, 0, 0);
-
-    QString letters = "abcdefgh";
-
-
-    // Нумерация по краям
-    for (int row = 0; row < 8; ++row) {
-        QLabel* rowLabelLeft = new QLabel(QString::number(8 - row));
-        rowLabelLeft->setAlignment(Qt::AlignCenter);
-        boardLayout->addWidget(rowLabelLeft, row + 1, 0);
-
-        QLabel* rowLabelRight = new QLabel(QString::number(8 - row));
-        rowLabelRight->setAlignment(Qt::AlignCenter);
-        boardLayout->addWidget(rowLabelRight, row + 1, 9);
-
-        for (int col = 0; col < 8; ++col) {
-            ClickableLabel* cell = new ClickableLabel();
-            cell->setFixedSize(90, 90);
-            cell->setAlignment(Qt::AlignCenter);
-            cell->row = row;
-            cell->col = col;
-            connect(cell, &ClickableLabel::clicked, this, &gamewindow::handleCellClick);
-            cell->setStyleSheet((row + col) % 2 == 0 ?
-                                    "background-color: #f0d9b5;" : "background-color: #b58863;");
-            boardLayout->addWidget(cell, row + 1, col + 1);
-            boardCells[row][col] = cell;
-        }
-    }
-
-    // Буквы сверху и снизу
-    for (int col = 0; col < 8; ++col) {
-        QLabel* topLabel = new QLabel(QString(letters[col]));
-        topLabel->setAlignment(Qt::AlignCenter);
-        boardLayout->addWidget(topLabel, 0, col + 1);
-
-        QLabel* bottomLabel = new QLabel(QString(letters[col]));
-        bottomLabel->setAlignment(Qt::AlignCenter);
-        boardLayout->addWidget(bottomLabel, 9, col + 1);
-    }
-
-
-    mainLayout->addWidget(boardContainer);
-
-    moveHistory = new QTextEdit();
-    moveHistory->setPlaceholderText("Ходы...");
-    moveHistory->setReadOnly(true);
-    moveHistory->setMinimumWidth(200);
-    moveHistory->setMaximumWidth(250);
-    mainLayout->addWidget(moveHistory);
-
-    setupChess960Position();
-}
-
-void gamewindow::setupChess960Position() {
-    QString pos = generateChess960Position();
-
-    for (int r = 0; r < 8; ++r)
-        for (int c = 0; c < 8; ++c)
-            boardState[r][c] = {NONE, NO_COLOR};
-
-    for (int col = 0; col < 8; ++col) {
-        QChar ch = pos[col];
-        PieceType type;
-        switch (ch.unicode()) {
-        case 'K': type = KING; break;
-        case 'Q': type = QUEEN; break;
-        case 'R': type = ROOK; break;
-        case 'B': type = BISHOP; break;
-        case 'N': type = KNIGHT; break;
-        default: type = NONE; break;
-        }
-
-        boardState[7][col] = {type, WHITE};
-        boardState[0][col] = {type, BLACK};
-        boardState[6][col] = {PAWN, WHITE};
-        boardState[1][col] = {PAWN, BLACK};
-    }
+    connect(m_logic, &PieceLogic::boardChanged, this, &gamewindow::onBoardChanged);
+    connect(m_logic, &PieceLogic::promotionRequired, this, &gamewindow::handlePromotion);
 
     updateBoardUI();
 }
 
-void gamewindow::clearHighlights() {
+void gamewindow::setupUI() {
+    QWidget* centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
+    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
+
+    // --- Левая панель (кнопки + съеденные фигуры) ---
+    QVBoxLayout *leftPanelLayout = new QVBoxLayout();
+    QWidget* leftPanelWidget = new QWidget();
+
+    // Кнопки управления
+    QHBoxLayout* buttonsLayout = new QHBoxLayout();
+    QPushButton* newGameButton = new QPushButton("Новая игра");
+    QPushButton* backToMenuButton = new QPushButton("В меню");
+
+    QString buttonStyle = R"(
+        QPushButton {
+            background-color: #555555; color: white; border: 1px solid #777777;
+            padding: 8px; font-weight: bold; border-radius: 4px;
+        }
+        QPushButton:hover { background-color: #666666; }
+        QPushButton:pressed { background-color: #444444; }
+    )";
+    newGameButton->setStyleSheet(buttonStyle);
+    backToMenuButton->setStyleSheet(buttonStyle);
+
+    connect(newGameButton, &QPushButton::clicked, this, &gamewindow::onNewGameClicked);
+    connect(backToMenuButton, &QPushButton::clicked, this, &gamewindow::onBackToMenuClicked);
+
+    buttonsLayout->addWidget(newGameButton);
+    buttonsLayout->addWidget(backToMenuButton);
+    leftPanelLayout->addLayout(buttonsLayout);
+
+    leftPanelLayout->addSpacing(20);
+
+    // Панели съеденных фигур
+    QLabel* blackCapturedLabel = new QLabel("Съеденные (Черные)");
+    blackCapturedLabel->setStyleSheet("color: white; font-weight: bold;");
+    leftPanelLayout->addWidget(blackCapturedLabel);
+    m_blackCapturedLayout = new QGridLayout();
+    m_blackCapturedLayout->setSpacing(5);
+    leftPanelLayout->addLayout(m_blackCapturedLayout);
+    leftPanelLayout->addStretch(1);
+
+    QLabel* whiteCapturedLabel = new QLabel("Съеденные (Белые)");
+    whiteCapturedLabel->setStyleSheet("color: white; font-weight: bold;");
+    leftPanelLayout->addWidget(whiteCapturedLabel);
+    m_whiteCapturedLayout = new QGridLayout();
+    m_whiteCapturedLayout->setSpacing(5);
+    leftPanelLayout->addLayout(m_whiteCapturedLayout);
+    leftPanelLayout->addStretch(1);
+
+    // Кнопки истории
+    QHBoxLayout* historyButtonsLayout = new QHBoxLayout();
+    m_prevMoveButton = new QPushButton("<");
+    m_nextMoveButton = new QPushButton(">");
+    QString historyButtonStyle = buttonStyle + "font-size: 18px;";
+    m_prevMoveButton->setFixedSize(40, 40);
+    m_nextMoveButton->setFixedSize(40, 40);
+    m_prevMoveButton->setStyleSheet(historyButtonStyle);
+    m_nextMoveButton->setStyleSheet(historyButtonStyle);
+
+    connect(m_prevMoveButton, &QPushButton::clicked, this, &gamewindow::onPrevMoveClicked);
+    connect(m_nextMoveButton, &QPushButton::clicked, this, &gamewindow::onNextMoveClicked);
+
+    historyButtonsLayout->addStretch();
+    historyButtonsLayout->addWidget(m_prevMoveButton);
+    historyButtonsLayout->addWidget(m_nextMoveButton);
+    historyButtonsLayout->addStretch();
+
+    leftPanelLayout->addLayout(historyButtonsLayout);
+    leftPanelWidget->setLayout(leftPanelLayout);
+
+    // --- Доска с нумерацией ---
+    QGridLayout *boardLayout = new QGridLayout();
+    boardLayout->setSpacing(0);
+    for (int c = 0; c < 8; ++c) {
+        QString letter = QChar('a' + c);
+        QLabel* topLetter = new QLabel(letter); topLetter->setAlignment(Qt::AlignCenter); topLetter->setFixedSize(90, 30); topLetter->setStyleSheet("color: white; font-weight: bold;");
+        QLabel* bottomLetter = new QLabel(letter); bottomLetter->setAlignment(Qt::AlignCenter); bottomLetter->setFixedSize(90, 30); bottomLetter->setStyleSheet("color: white; font-weight: bold;");
+        boardLayout->addWidget(topLetter, 0, c + 1); boardLayout->addWidget(bottomLetter, 9, c + 1);
+    }
     for (int r = 0; r < 8; ++r) {
+        QString number = QString::number(8 - r);
+        QLabel* leftNumber = new QLabel(number); leftNumber->setAlignment(Qt::AlignCenter); leftNumber->setFixedSize(30, 90); leftNumber->setStyleSheet("color: white; font-weight: bold;");
+        QLabel* rightNumber = new QLabel(number); rightNumber->setAlignment(Qt::AlignCenter); rightNumber->setFixedSize(30, 90); rightNumber->setStyleSheet("color: white; font-weight: bold;");
+        boardLayout->addWidget(leftNumber, r + 1, 0); boardLayout->addWidget(rightNumber, r + 1, 10);
         for (int c = 0; c < 8; ++c) {
-            QString color = (r + c) % 2 == 0 ? "#f0d9b5" : "#b58863";
-            boardCells[r][c]->setStyleSheet(QString("background-color: %1; border: none;").arg(color));
+            ClickableLabel* cell = new ClickableLabel(); cell->setFixedSize(90, 90); cell->setAlignment(Qt::AlignCenter); cell->row = r; cell->col = c;
+            connect(cell, &ClickableLabel::clicked, this, &gamewindow::handleCellClick);
+            boardLayout->addWidget(cell, r + 1, c + 1);
+            m_boardCells[r][c] = cell;
         }
+    }
+    QWidget* boardContainer = new QWidget();
+    boardContainer->setLayout(boardLayout);
+    boardContainer->setFixedSize(boardLayout->sizeHint());
+
+    // --- История ходов (справа) ---
+    m_moveHistory = new QTextEdit();
+    m_moveHistory->setReadOnly(true);
+    m_moveHistory->setStyleSheet("background-color: #3c3c3c; color: white; border: 1px solid gray;");
+    m_moveHistory->setMinimumWidth(200);
+
+    // Верстка главного окна
+    mainLayout->addWidget(leftPanelWidget);
+    mainLayout->addStretch(1);
+    mainLayout->addWidget(boardContainer);
+    mainLayout->addStretch(1);
+    mainLayout->addWidget(m_moveHistory);
+}
+
+void gamewindow::onBoardChanged() {
+    updateBoardUI(nullptr);
+}
+
+void gamewindow::onNewGameClicked() {
+    m_logic->setupNewGame();
+    m_logic->resetHistoryBrowser();
+    m_moveHistory->clear();
+    m_selectedRow = -1;
+    m_selectedCol = -1;
+}
+
+void gamewindow::onBackToMenuClicked() {
+    emit menuRequested();
+    this->close();
+}
+
+void gamewindow::onPrevMoveClicked() {
+    const Piece* historyBoard = m_logic->browseHistory(-1);
+    if (historyBoard) {
+        updateBoardUI(historyBoard);
     }
 }
 
-void gamewindow::highlightValidMoves(int row, int col) {
-    clearHighlights();
-
-    // Подсветка выбранной фигуры
-    boardCells[row][col]->setStyleSheet("background-color: #f7f3d3; border: 2px solid yellow;");
-
-    // Получаем все возможные ходы
-    for (int r = 0; r < 8; ++r) {
-        for (int c = 0; c < 8; ++c) {
-            if (row == r && col == c) continue;
-
-            Move move = {row, col, r, c};
-            if (isValidMove(boardState, move, currentTurn)) {
-                Piece target = boardState[r][c];
-
-                if (target.type == NONE) {
-                    boardCells[r][c]->setStyleSheet(
-                        (r + c) % 2 == 0 ?
-                            "background-color: #f0d9b5; border: 2px solid green;" :
-                            "background-color: #b58863; border: 2px solid green;"
-                        );
-                } else if (target.color != currentTurn) {
-                    boardCells[r][c]->setStyleSheet(
-                        (r + c) % 2 == 0 ?
-                            "background-color: #f0d9b5; border: 2px solid yellow;" :
-                            "background-color: #b58863; border: 2px solid yellow;"
-                        );
-                }
-            }
-        }
+void gamewindow::onNextMoveClicked() {
+    const Piece* historyBoard = m_logic->browseHistory(1);
+    if (historyBoard) {
+        updateBoardUI(historyBoard);
     }
 }
-
-bool gamewindow::hasLegalMove(PieceColor color) {
-    for (int r1 = 0; r1 < 8; ++r1) {
-        for (int c1 = 0; c1 < 8; ++c1) {
-            if (boardState[r1][c1].color != color)
-                continue;
-
-            for (int r2 = 0; r2 < 8; ++r2) {
-                for (int c2 = 0; c2 < 8; ++c2) {
-                    Move move = {r1, c1, r2, c2};
-                    if (isValidMove(boardState, move, color)) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
 
 void gamewindow::handleCellClick(int row, int col) {
-    Piece clickedPiece = boardState[row][col];
-
-
-    if (selectedRow == -1 && selectedCol == -1) {
-        if (clickedPiece.color == currentTurn) {
-            selectedRow = row;
-            selectedCol = col;
-            highlightValidMoves(row, col);
-        }
+    if (m_logic->getGameStatus() != IN_PROGRESS) {
+        m_selectedRow = -1;
+        m_selectedCol = -1;
+        updateBoardUI(m_logic->browseHistory(0));
         return;
     }
-
-
-    if (clickedPiece.color == currentTurn) {
-        selectedRow = row;
-        selectedCol = col;
-        highlightValidMoves(row, col);
-        return;
-    }
-
-    Move move = {selectedRow, selectedCol, row, col};
-    if (isValidMove(boardState, move, currentTurn)) {
-        // Сохраняем информацию о фигурах до выполнения хода
-        Piece movingPiece = boardState[selectedRow][selectedCol];
-        Piece targetPiece = boardState[row][col];
-
-        // ---- ЗАПИСЬ ХОДА ----
-        QString pieceName;
-        switch (movingPiece.type) {
-        case KING: pieceName = "king"; break;
-        case QUEEN: pieceName = "queen"; break;
-        case ROOK: pieceName = "rook"; break;
-        case BISHOP: pieceName = "bishop"; break;
-        case KNIGHT: pieceName = "knight"; break;
-        case PAWN: pieceName = "pawn"; break;
-        default: pieceName = "unknown"; break;
+    if (m_selectedRow == -1) {
+        if (m_logic->getPieceAt(row, col).color == m_logic->getCurrentTurn()) {
+            m_selectedRow = row; m_selectedCol = col;
+            updateBoardUI();
+            highlightValidMoves();
         }
-
-        QString from = QString(QChar('a' + selectedCol)) + QString::number(8 - selectedRow);
-        QString to = QString(QChar('a' + col)) + QString::number(8 - row);
-        QString colorStr = (movingPiece.color == WHITE) ? "white" : "black";
-
-        QString notation = from + "-" + to + " (" + colorStr + " " + pieceName + ")";
-        moveHistory->append(notation);
-
-        // ---- СЪЕДЕННАЯ ФИГУРА ----
-        if (targetPiece.type != NONE && targetPiece.color != NO_COLOR) {
-            QString imgPath = ":/new/prefix1/pieces600/" +
-                              QString(targetPiece.color == WHITE ? "w" : "b") +
-                              QString(targetPiece.type == KING ? "k" :
-                                          targetPiece.type == QUEEN ? "q" :
-                                          targetPiece.type == ROOK ? "r" :
-                                          targetPiece.type == BISHOP ? "b" :
-                                          targetPiece.type == KNIGHT ? "n" :
-                                          targetPiece.type == PAWN ? "p" : "") +
-                              ".png";
-
-            QLabel *capturedLabel = new QLabel();
-            capturedLabel->setPixmap(QPixmap(imgPath).scaled(30, 30));
-
-            if (targetPiece.color == WHITE) {
-                whiteCapturedLayout->addWidget(capturedLabel);
-            } else {
-                blackCapturedLayout->addWidget(capturedLabel);
-            }
+    } else {
+        QString notation = "";
+        if (m_logic->getPieceAt(m_selectedRow, m_selectedCol).type != NONE) {
+            Piece movingPiece = m_logic->getPieceAt(m_selectedRow, m_selectedCol);
+            QString fromStr = QChar('a' + m_selectedCol) + QString::number(8 - m_selectedRow);
+            QString toStr = QChar('a' + col) + QString::number(8 - row);
+            QMap<PieceType, QString> pieceNames = { {PAWN, "Pawn"}, {KNIGHT, "Knight"}, {BISHOP, "Bishop"}, {ROOK, "Rook"}, {QUEEN, "Queen"}, {KING, "King"} };
+            QString colorStr = (movingPiece.color == WHITE) ? "White" : "Black";
+            notation = QString("%1-%2 (%3 %4)").arg(fromStr, toStr, colorStr, pieceNames[movingPiece.type]);
         }
-
-        // ---- ВЫПОЛНЕНИЕ ХОДА ----
-        boardState[row][col] = movingPiece;
-        boardState[selectedRow][selectedCol] = {NONE, NO_COLOR};
-
-        selectedRow = -1;
-        selectedCol = -1;
-        clearHighlights();
-
-        // ---- ПРОВЕРКА НА МАТ / ПАТ ----
-        PieceColor opponent = (currentTurn == WHITE) ? BLACK : WHITE;
-
-        if (isKingInCheck(boardState, opponent)) {
-            if (!hasLegalMove(opponent)) {
-                QMessageBox::information(this, "Мат", (opponent == WHITE ? "Белым" : "Чёрным") + QString(" мат!"));
-                return;
+        if (m_logic->tryMove(m_selectedRow, m_selectedCol, row, col)) {
+            if (!notation.isEmpty()) { m_moveHistory->append(notation); }
+            m_selectedRow = -1; m_selectedCol = -1;
+            GameStatus status = m_logic->getGameStatus();
+            if (status != IN_PROGRESS) {
+                onBoardChanged();
+                if (status == CHECKMATE) {
+                    QMessageBox::information(this, "Игра окончена", "Мат! " + QString(m_logic->getCurrentTurn() == WHITE ? "Черные" : "Белые") + " победили.");
+                } else if (status == STALEMATE) {
+                    QMessageBox::information(this, "Игра окончена", "Пат! Ничья.");
+                }
             }
         } else {
-            if (!hasLegalMove(opponent)) {
-                QMessageBox msgBox;
-                msgBox.setWindowTitle("Игра окончена");
-                msgBox.setText("Пат! Ничья.");
-                QPushButton *menuButton = msgBox.addButton("В меню", QMessageBox::AcceptRole);
-                msgBox.exec();
+            m_selectedRow = -1; m_selectedCol = -1;
+            updateBoardUI();
+        }
+    }
+}
 
-                if (msgBox.clickedButton() == menuButton) {
-                    this->close();
-                    emit returnToMenu();
+void gamewindow::updateBoardUI(const Piece* boardState) {
+    clearHighlights();
+
+    bool isBrowsingHistory = (boardState != nullptr);
+
+    for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
+            Piece p = isBrowsingHistory ? boardState[r * 8 + c] : m_logic->getPieceAt(r, c);
+            m_boardCells[r][c]->setPixmap(p.type != NONE ? QPixmap(getPieceImagePath(p)).scaled(80, 80, Qt::KeepAspectRatio, Qt::SmoothTransformation) : QPixmap());
+        }
+
+    if (!isBrowsingHistory) {
+        const int maxCols = 5;
+        clearLayout(m_whiteCapturedLayout);
+        const auto& whiteCaptured = m_logic->getCapturedPieces(WHITE);
+        for (size_t i = 0; i < whiteCaptured.size(); ++i) {
+            QLabel* capturedLabel = new QLabel();
+            // ИСПРАВЛЕНИЕ 1: Увеличиваем размер иконок и задаем фиксированный размер виджета
+            capturedLabel->setFixedSize(35, 35);
+            capturedLabel->setPixmap(QPixmap(getPieceImagePath(whiteCaptured[i])).scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            m_whiteCapturedLayout->addWidget(capturedLabel, i / maxCols, i % maxCols);
+        }
+        clearLayout(m_blackCapturedLayout);
+        const auto& blackCaptured = m_logic->getCapturedPieces(BLACK);
+        for (size_t i = 0; i < blackCaptured.size(); ++i) {
+            QLabel* capturedLabel = new QLabel();
+            // ИСПРАВЛЕНИЕ 1: Увеличиваем размер иконок и задаем фиксированный размер виджета
+            capturedLabel->setFixedSize(35, 35);
+            capturedLabel->setPixmap(QPixmap(getPieceImagePath(blackCaptured[i])).scaled(35, 35, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            m_blackCapturedLayout->addWidget(capturedLabel, i / maxCols, i % maxCols);
+        }
+        if (m_logic->isKingInCheck(m_logic->getCurrentTurn())) {
+            for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
+                    Piece p = m_logic->getPieceAt(r, c);
+                    if (p.type == KING && p.color == m_logic->getCurrentTurn()) {
+                        m_boardCells[r][c]->setStyleSheet("background-color: #ff6666;");
+                        break;
+                    }
                 }
-            }
-        }
-
-        // ---- ПРОМОЦИЯ ПЕШКИ ----
-        if (boardState[row][col].type == PAWN &&
-            ((boardState[row][col].color == WHITE && row == 0) ||
-             (boardState[row][col].color == BLACK && row == 7))) {
-
-            PromotionDialog dialog(boardState[row][col].color, this);
-            if (dialog.exec() == QDialog::Accepted) {
-                boardState[row][col].type = dialog.selectedType;
-            }
-        }
-
-        switchTurn();
-        updateBoardUI();
-    }
-
-
-    if (boardState[row][col].type == PAWN &&
-        ((boardState[row][col].color == WHITE && row == 0) ||
-         (boardState[row][col].color == BLACK && row == 7))) {
-
-        PromotionDialog dialog(boardState[row][col].color, this);
-        if (dialog.exec() == QDialog::Accepted) {
-            boardState[row][col].type = dialog.selectedType;
         }
     }
 
-    updateBoardUI();  // Обновляем доску перед проверками
+    bool isGameOver = m_logic->getGameStatus() != IN_PROGRESS;
+    m_prevMoveButton->setVisible(isGameOver);
+    m_nextMoveButton->setVisible(isGameOver);
 
+    if (isGameOver) {
+        m_prevMoveButton->setEnabled(m_logic->getCurrentHistoryIndex() > 0);
+        m_nextMoveButton->setEnabled(m_logic->getCurrentHistoryIndex() < m_logic->getHistorySize() - 1);
+    }
 }
 
-void gamewindow::switchTurn() {
-    currentTurn = (currentTurn == WHITE) ? BLACK : WHITE;
+void gamewindow::handlePromotion(int row, int col, PieceColor color) {
+    PromotionDialog dialog(color, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        m_logic->promotePawn(row, col, dialog.selectedType);
+    } else {
+        m_logic->promotePawn(row, col, QUEEN);
+    }
 }
 
-void gamewindow::updateBoardUI() {
-    QMap<QPair<PieceColor, PieceType>, QString> pieceImages = {
-        {{WHITE, KING}, ":/new/prefix1/pieces600/wk.png"},
-        {{WHITE, QUEEN}, ":/new/prefix1/pieces600/wq.png"},
-        {{WHITE, ROOK}, ":/new/prefix1/pieces600/wr.png"},
-        {{WHITE, BISHOP}, ":/new/prefix1/pieces600/wb.png"},
-        {{WHITE, KNIGHT}, ":/new/prefix1/pieces600/wn.png"},
-        {{WHITE, PAWN}, ":/new/prefix1/pieces600/wp.png"},
-        {{BLACK, KING}, ":/new/prefix1/pieces600/bk.png"},
-        {{BLACK, QUEEN}, ":/new/prefix1/pieces600/bq.png"},
-        {{BLACK, ROOK}, ":/new/prefix1/pieces600/br.png"},
-        {{BLACK, BISHOP}, ":/new/prefix1/pieces600/bb.png"},
-        {{BLACK, KNIGHT}, ":/new/prefix1/pieces600/bn.png"},
-        {{BLACK, PAWN}, ":/new/prefix1/pieces600/bp.png"}
-    };
-
-    for (int r = 0; r < 8; ++r){
-        for (int c = 0; c < 8; ++c) {
-            Piece p = boardState[r][c];
-            if (p.type == NONE) boardCells[r][c]->clear();
-            else boardCells[r][c]->setPixmap(QPixmap(pieceImages.value({p.color, p.type})).scaled(90, 90));
+void gamewindow::clearHighlights() {
+    for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
+            m_boardCells[r][c]->setStyleSheet((r + c) % 2 == 0 ? "background-color: #f0d9b5;" : "background-color: #b58863;");
         }
-    }
-    // Подсветка короля под шахом
-    if (isKingInCheck(boardState, currentTurn)) {
-        for (int r = 0; r < 8; ++r) {
-            for (int c = 0; c < 8; ++c) {
-                if (boardState[r][c].type == KING && boardState[r][c].color == currentTurn) {
-                    boardCells[r][c]->setStyleSheet("border: 3px solid red;");
-                    return; // нашли короля, выходим
-                }
-            }
-        }
-    }
-
-
 }
 
+void gamewindow::highlightValidMoves() {
+    if(m_selectedRow == -1) return;
+    QString currentStyle = m_boardCells[m_selectedRow][m_selectedCol]->styleSheet();
+    m_boardCells[m_selectedRow][m_selectedCol]->setStyleSheet(currentStyle + " border: 3px solid #6699ff;");
+    std::vector<Move> moves = m_logic->getValidMovesForPiece(m_selectedRow, m_selectedCol);
+    for (const auto& move : moves) {
+        QString baseStyle = m_boardCells[move.toRow][move.toCol]->styleSheet();
+        if (m_logic->getPieceAt(move.toRow, move.toCol).type != NONE) {
+            baseStyle += " border: 4px solid #cc3333;";
+        } else {
+            baseStyle += " border: 4px solid #66cc66;";
+        }
+        m_boardCells[move.toRow][move.toCol]->setStyleSheet(baseStyle);
+    }
+}
 
-gamewindow::~gamewindow() {}
+QString gamewindow::getPieceImagePath(const Piece& piece) {
+    if (piece.type == NONE) return "";
+    QMap<PieceType, QChar> typeMap = { {KING, 'k'}, {QUEEN, 'q'}, {ROOK, 'r'}, {BISHOP, 'b'}, {KNIGHT, 'n'}, {PAWN, 'p'} };
+    char colorChar = (piece.color == WHITE) ? 'w' : 'b';
+    return QString(":/new/prefix1/pieces600/%1%2.png").arg(colorChar).arg(typeMap[piece.type]);
+}
+
+void gamewindow::clearLayout(QLayout* layout) {
+    QLayoutItem *item;
+    while((item = layout->takeAt(0)) != nullptr){
+        if (item->widget()){
+            delete item->widget();
+        } else if (item->layout()) {
+            clearLayout(item->layout());
+        }
+        delete item;
+    }
+}

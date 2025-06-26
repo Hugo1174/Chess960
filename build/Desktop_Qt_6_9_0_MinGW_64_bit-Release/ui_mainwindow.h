@@ -182,7 +182,7 @@ public:
         pushButton_play1->setText(QCoreApplication::translate("MainWindow", "\320\230\320\223\320\240\320\220 \320\235\320\220 \320\236\320\224\320\235\320\236\320\231 \320\224\320\236\320\241\320\232\320\225", nullptr));
         pushButton_play2->setText(QCoreApplication::translate("MainWindow", "\320\230\320\223\320\240\320\220 \320\237\320\240\320\236\320\242\320\230\320\222 \320\221\320\236\320\242\320\220", nullptr));
         pushButton_play3->setText(QCoreApplication::translate("MainWindow", "\320\230\320\223\320\240\320\220 \320\237\320\236 \320\241\320\225\320\242\320\230", nullptr));
-        pushButton_guide->setText(QCoreApplication::translate("MainWindow", "\320\223\320\220\320\231\320\224", nullptr));
+        pushButton_guide->setText(QCoreApplication::translate("MainWindow", "\320\240\320\243\320\232\320\236\320\222\320\236\320\224\320\241\320\242\320\222\320\236 \320\237\320\236\320\233\320\254\320\227\320\236\320\222\320\220\320\242\320\225\320\233\320\257", nullptr));
         pushButton_exit->setText(QCoreApplication::translate("MainWindow", "\320\222\320\253\320\245\320\236\320\224", nullptr));
         label_5->setText(QString());
         label->setText(QString());

@@ -6,6 +6,7 @@ debug/mainwindow.o
 debug/piece_logic.o
 debug/promotiondialog.o
 debug/qrc_guide_img.o
+debug/qrc_newpieces.o
 debug/qrc_pieces.o
 debug/moc_clickablelabel.o
 debug/moc_gamewindow.o

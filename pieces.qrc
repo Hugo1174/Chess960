@@ -13,4 +13,5 @@
         <file>pieces600/wq.png</file>
         <file>pieces600/wr.png</file>
     </qresource>
+    <qresource prefix="/newpieces"/>
 </RCC>

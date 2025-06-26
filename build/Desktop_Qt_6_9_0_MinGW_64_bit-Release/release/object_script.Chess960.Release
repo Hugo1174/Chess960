@@ -6,6 +6,7 @@ release/mainwindow.o
 release/piece_logic.o
 release/promotiondialog.o
 release/qrc_guide_img.o
+release/qrc_newpieces.o
 release/qrc_pieces.o
 release/moc_clickablelabel.o
 release/moc_gamewindow.o

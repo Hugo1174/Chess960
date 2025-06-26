@@ -40,13 +40,42 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
         "gamewindow",
-        "returnToMenu",
-        ""
+        "menuRequested",
+        "",
+        "handleCellClick",
+        "row",
+        "col",
+        "onBoardChanged",
+        "handlePromotion",
+        "PieceColor",
+        "color",
+        "onNewGameClicked",
+        "onBackToMenuClicked",
+        "onPrevMoveClicked",
+        "onNextMoveClicked"
     };
 
     QtMocHelpers::UintData qt_methods {
-        // Signal 'returnToMenu'
+        // Signal 'menuRequested'
         QtMocHelpers::SignalData<void()>(1, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'handleCellClick'
+        QtMocHelpers::SlotData<void(int, int)>(3, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 4 }, { QMetaType::Int, 5 },
+        }}),
+        // Slot 'onBoardChanged'
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'handlePromotion'
+        QtMocHelpers::SlotData<void(int, int, PieceColor)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::Int, 4 }, { QMetaType::Int, 5 }, { 0x80000000 | 8, 9 },
+        }}),
+        // Slot 'onNewGameClicked'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onBackToMenuClicked'
+        QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onPrevMoveClicked'
+        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onNextMoveClicked'
+        QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -70,12 +99,19 @@ void gamewindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     auto *_t = static_cast<gamewindow *>(_o);
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: _t->returnToMenu(); break;
+        case 0: _t->menuRequested(); break;
+        case 1: _t->handleCellClick((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2]))); break;
+        case 2: _t->onBoardChanged(); break;
+        case 3: _t->handlePromotion((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<PieceColor>>(_a[3]))); break;
+        case 4: _t->onNewGameClicked(); break;
+        case 5: _t->onBackToMenuClicked(); break;
+        case 6: _t->onPrevMoveClicked(); break;
+        case 7: _t->onNextMoveClicked(); break;
         default: ;
         }
     }
     if (_c == QMetaObject::IndexOfMethod) {
-        if (QtMocHelpers::indexOfMethod<void (gamewindow::*)()>(_a, &gamewindow::returnToMenu, 0))
+        if (QtMocHelpers::indexOfMethod<void (gamewindow::*)()>(_a, &gamewindow::menuRequested, 0))
             return;
     }
 }
@@ -99,20 +135,20 @@ int gamewindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 8)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 8;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
+        if (_id < 8)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 1;
+        _id -= 8;
     }
     return _id;
 }
 
 // SIGNAL 0
-void gamewindow::returnToMenu()
+void gamewindow::menuRequested()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }

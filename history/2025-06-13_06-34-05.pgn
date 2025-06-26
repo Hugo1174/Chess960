@@ -1,0 +1,9 @@
+[Event "Chess960 Game"]
+[Site "Local"]
+[Date "2025.06.13"]
+[Round "1"]
+[White "Player1"]
+[Black "Player2"]
+[Result "*"]
+
+1. e2-e4 d7-d5 2. e4-d5 c7-c6 3. d5-c6 b7-c6 4. e1-e7 e8-e7 5. f1-e3 c6-c5 6. e3-d5 e7-c7 7. d5-c7 d8-c7 8. g1-e1 c5-c4 9. d2-d3 c4-d3 10. c2-d3 c7-b7 11. e1-e8 b7-a6 12. d3-d4 c8-b7 13. d4-d5 b7-c6 14. d5-d6 c6-b7 15. d6-d7 b7-c8 16. d7-d8 c8-b7 17. d8-b8 b7-c8 18. e8-c8 a6-a5 19. b8-a8 a5-a4 20. c8-b8 a4-a5 21. a8-a7 
