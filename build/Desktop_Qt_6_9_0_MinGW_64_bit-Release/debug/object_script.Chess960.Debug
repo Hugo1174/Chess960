@@ -3,13 +3,13 @@ debug/gamewindow.o
 debug/guidewindow.o
 debug/main.o
 debug/mainwindow.o
-debug/piece_logic.o
 debug/promotiondialog.o
+debug/piece_logic.o
 debug/qrc_guide_img.o
-debug/qrc_newpieces.o
 debug/qrc_pieces.o
 debug/moc_clickablelabel.o
 debug/moc_gamewindow.o
 debug/moc_guidewindow.o
 debug/moc_mainwindow.o
 debug/moc_promotiondialog.o
+debug/moc_piece_logic.o

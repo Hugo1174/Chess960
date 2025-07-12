@@ -3,13 +3,13 @@ release/gamewindow.o
 release/guidewindow.o
 release/main.o
 release/mainwindow.o
-release/piece_logic.o
 release/promotiondialog.o
+release/piece_logic.o
 release/qrc_guide_img.o
-release/qrc_newpieces.o
 release/qrc_pieces.o
 release/moc_clickablelabel.o
 release/moc_gamewindow.o
 release/moc_guidewindow.o
 release/moc_mainwindow.o
 release/moc_promotiondialog.o
+release/moc_piece_logic.o
