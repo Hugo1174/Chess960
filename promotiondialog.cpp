@@ -1,14 +1,22 @@
+// promotiondialog.cpp
+// Реализация диалога выбора фигуры.
+
 #include "promotiondialog.h"
 #include <QPushButton>
 #include <QHBoxLayout>
 
-PromotionDialog::PromotionDialog(PieceColor color, QWidget *parent) : QDialog(parent), selectedType(QUEEN) {
+PromotionDialog::PromotionDialog(PieceColor color, QWidget *parent)
+    : QDialog(parent), selectedType(QUEEN) // Ферзь - выбор по умолчанию.
+{
     setWindowTitle("Выбор фигуры");
+    setModal(true); // Блокируем основное окно.
 
     QHBoxLayout *layout = new QHBoxLayout(this);
 
+    // Формируем путь к иконкам в зависимости от цвета.
     QString prefix = (color == WHITE) ? ":/new/prefix1/pieces600/w" : ":/new/prefix1/pieces600/b";
 
+    // Создаем кнопки с иконками фигур.
     QPushButton *queenBtn = new QPushButton();
     queenBtn->setIcon(QIcon(prefix + "q.png"));
     queenBtn->setIconSize(QSize(64, 64));
@@ -35,6 +43,7 @@ PromotionDialog::PromotionDialog(PieceColor color, QWidget *parent) : QDialog(pa
     layout->addWidget(knightBtn);
 }
 
+// Слоты устанавливают результат и закрывают диалог с флагом "успешно".
 void PromotionDialog::selectQueen()  { selectedType = QUEEN; accept(); }
 void PromotionDialog::selectRook()   { selectedType = ROOK; accept(); }
 void PromotionDialog::selectBishop() { selectedType = BISHOP; accept(); }

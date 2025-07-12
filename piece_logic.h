@@ -1,3 +1,6 @@
+// piece_logic.h
+// Определяет ядро игровой логики (Model).
+
 #ifndef PIECE_LOGIC_H
 #define PIECE_LOGIC_H
 
@@ -6,17 +9,20 @@
 #include <utility>
 #include <array>
 
-// --- Основные структуры данных для игры ---
-
+// Тип фигуры
 enum PieceType { NONE, KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN };
+// Цвет фигуры
 enum PieceColor { NO_COLOR, WHITE, BLACK };
+// Текущий статус игры
 enum GameStatus { IN_PROGRESS, CHECKMATE, STALEMATE };
 
+// Структура, описывающая одну фигуру
 struct Piece {
     PieceType type = NONE;
     PieceColor color = NO_COLOR;
 };
 
+// Структура, описывающая один ход
 struct Move {
     int fromRow, fromCol;
     int toRow, toCol;
@@ -24,11 +30,10 @@ struct Move {
 
 /**
  * @class PieceLogic
- * @brief Класс, инкапсулирующий всю логику шахматной игры (Модель).
+ * @brief Ядро игровой логики (Model).
  *
- * Этот класс ничего не знает об интерфейсе. Он управляет состоянием доски,
- * проверяет корректность ходов, определяет исход игры и хранит историю партии.
- * Взаимодействует с UI через сигналы и публичные методы.
+ * Управляет состоянием доски, правилами игры (включая Chess960),
+ * проверкой ходов, историей партии. Полностью независим от UI.
  */
 class PieceLogic : public QObject
 {
@@ -50,21 +55,16 @@ public:
     std::vector<Move> getValidMovesForPiece(int row, int col);
     bool isKingInCheck(PieceColor kingColor) const;
 
-    // --- Новые методы для просмотра истории ---
-    const Piece* browseHistory(int step);
+    // --- Методы для просмотра истории ---
+    const Piece* browseHistory(int step); // Шаг: +1 (вперед), -1 (назад)
     void resetHistoryBrowser();
     int getHistorySize() const;
     int getCurrentHistoryIndex() const;
 
 signals:
-    /**
-     * @brief Сигнал, испускаемый, когда пешка достигла последней горизонтали и требует превращения.
-     */
+    // Испускается, когда пешка достигла последней горизонтали.
     void promotionRequired(int row, int col, PieceColor color);
-
-    /**
-     * @brief Сигнал, испускаемый после любого успешного изменения состояния доски.
-     */
+    // Испускается после любого изменения на доске.
     void boardChanged();
 
 private:
@@ -74,15 +74,19 @@ private:
     GameStatus m_gameStatus;
     std::vector<Piece> m_whiteCaptured;
     std::vector<Piece> m_blackCaptured;
-    bool m_castlingRights[3][2]; // [цвет][0-длинная, 1-короткая]
+    // Права на рокировку [цвет][0 - длинная, 1 - короткая].
+    bool m_castlingRights[3][2];
+    // Начальные позиции короля и ладей для правил Chess960.
     int m_kingInitialCol[3];
     int m_rookInitialCols[3][2];
+    // Последний совершенный ход.
     Move m_lastMove;
+    // Координаты клетки, уязвимой для взятия на проходе.
     std::pair<int, int> m_enPassantTargetSquare;
 
-    // --- Хранение и просмотр истории ---
+    // История ходов в виде полных состояний доски.
     std::vector<std::array<Piece, 64>> m_history;
-    int m_historyBrowserIndex;
+    int m_historyBrowserIndex; // Текущая позиция при просмотре истории.
 
     // --- Приватные вспомогательные функции ---
     void generateChess960Position();
@@ -90,15 +94,18 @@ private:
     void updateGameStatus();
     bool hasLegalMoves(PieceColor color);
 
-    // Функции проверки правил, работающие с любой доской (для симуляции)
+    // --- Функции проверки правил ---
+    // Главная функция проверки хода, включая проверку на шах королю.
     bool isMoveValid(const Piece board[8][8], PieceColor turn, const Move& move, bool checkKingSafety = true) const;
+    // Проверяет, атакована ли клетка фигурами указанного цвета.
     bool isSquareAttacked(const Piece board[8][8], int row, int col, PieceColor attackerColor) const;
     bool isKingInCheck(const Piece board[8][8], PieceColor kingColor) const;
 
-    // Функции проверки ходов для конкретных фигур
+    // Функции проверки ходов для конкретных фигур.
     bool isPawnMoveValid(const Piece board[8][8], const Move& move) const;
     bool isKnightMoveValid(const Move& move) const;
     bool isKingMoveValid(const Piece board[8][8], PieceColor turn, const Move& move) const;
+    // Обобщенная функция для скользящих фигур (ферзь, ладья, слон).
     bool isSlidingMoveValid(const Piece board[8][8], const Move& move, std::initializer_list<std::pair<int, int>> directions) const;
 };
 

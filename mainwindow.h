@@ -1,3 +1,6 @@
+// mainwindow.h
+// Главное меню приложения.
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -10,6 +13,13 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+/**
+ * @class MainWindow
+ * @brief Стартовое окно (главное меню).
+ *
+ * Предоставляет навигацию: запуск игры, открытие справки, выход.
+ * Управляет жизненным циклом окон gamewindow и guidewindow.
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,18 +29,20 @@ public:
     ~MainWindow();
 
 private slots:
+    // Слоты для кнопок главного меню.
     void on_pushButton_play2_clicked();
     void on_pushButton_play3_clicked();
     void on_pushButton_play1_clicked();
     void on_pushButton_guide_clicked();
     void on_pushButton_exit_clicked();
 
-    // ИСПРАВЛЕНИЕ 1: Новый слот для возврата в меню
+    // Слот, обрабатывающий сигнал menuRequested от gamewindow.
     void handleReturnToMenu();
 
 private:
     Ui::MainWindow *ui;
+    // Указатели для управления дочерними окнами.
     guidewindow* guide_w = nullptr;
-    gamewindow *game_w = nullptr; // <-- Убираем инициализацию nullptr здесь
+    gamewindow *game_w = nullptr;
 };
 #endif // MAINWINDOW_H
