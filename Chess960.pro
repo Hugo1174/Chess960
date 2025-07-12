@@ -13,6 +13,7 @@ HEADERS += \
     gamewindow.h \
     guidewindow.h \
     mainwindow.h \
+    networkhandler.h \
     promotiondialog.h \
     piece_logic.h
 SOURCES += \
@@ -21,6 +22,7 @@ SOURCES += \
     guidewindow.cpp \
     main.cpp \
     mainwindow.cpp \
+    networkhandler.cpp \
     promotiondialog.cpp \
     piece_logic.cpp
 

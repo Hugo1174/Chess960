@@ -168,6 +168,39 @@ void PieceLogic::promotePawn(int row, int col, PieceType newType) {
         emit boardChanged();
     }
 }
+void PieceLogic::loadGame(const std::array<Piece, 64>& board, PieceColor startingTurn)
+{
+    // Полный сброс состояния
+    m_whiteCaptured.clear();
+    m_blackCaptured.clear();
+    m_castlingRights[WHITE][0] = m_castlingRights[WHITE][1] = true;
+    m_castlingRights[BLACK][0] = m_castlingRights[BLACK][1] = true;
+    m_lastMove = {};
+    m_enPassantTargetSquare = {-1, -1};
+    m_gameStatus = IN_PROGRESS;
+
+    // Загрузка доски и установка хода
+    std::copy(board.begin(), board.end(), &m_board[0][0]);
+    m_currentTurn = startingTurn;
+
+    // Важно: пересчитываем начальные позиции короля и ладей для рокировки
+    for (int col = 0; col < 8; ++col) {
+        if (m_board[7][col].type == KING) m_kingInitialCol[WHITE] = col;
+        if (m_board[0][col].type == KING) m_kingInitialCol[BLACK] = col;
+    }
+    int w_rooks = 0, b_rooks = 0;
+    for (int col = 0; col < 8; ++col) {
+        if (m_board[7][col].type == ROOK) m_rookInitialCols[WHITE][w_rooks++] = col;
+        if (m_board[0][col].type == ROOK) m_rookInitialCols[BLACK][b_rooks++] = col;
+    }
+
+    // Сохранение в историю
+    m_history.clear();
+    m_history.push_back(board);
+    resetHistoryBrowser();
+
+    emit boardChanged();
+}
 
 bool PieceLogic::isMoveValid(const Piece board[8][8], PieceColor turn, const Move& move, bool checkKingSafety) const {
     Piece movingPiece = board[move.fromRow][move.fromCol];
@@ -200,6 +233,7 @@ bool PieceLogic::isMoveValid(const Piece board[8][8], PieceColor turn, const Mov
         if (isKingInCheck(tempBoard, turn)) return false;
     }
     return true;
+    return isMoveValid(m_board, m_currentTurn, move, true);
 }
 
 bool PieceLogic::isPawnMoveValid(const Piece board[8][8], const Move& move) const {

@@ -7,7 +7,6 @@
 *****************************************************************************/
 
 #include "../../../gamewindow.h"
-#include <QtGui/qtextcursor.h>
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
@@ -52,7 +51,20 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         "onNewGameClicked",
         "onBackToMenuClicked",
         "onPrevMoveClicked",
-        "onNextMoveClicked"
+        "onNextMoveClicked",
+        "onConnected",
+        "onDisconnected",
+        "onNetworkError",
+        "error",
+        "onGameStartReceived",
+        "std::array<Piece,64>",
+        "board",
+        "myColor",
+        "onMoveReceived",
+        "Move",
+        "move",
+        "PieceType",
+        "promotionType"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -76,6 +88,22 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onNextMoveClicked'
         QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onConnected'
+        QtMocHelpers::SlotData<void()>(14, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onDisconnected'
+        QtMocHelpers::SlotData<void()>(15, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onNetworkError'
+        QtMocHelpers::SlotData<void(const QString &)>(16, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 17 },
+        }}),
+        // Slot 'onGameStartReceived'
+        QtMocHelpers::SlotData<void(const std::array<Piece,64> &, PieceColor)>(18, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 19, 20 }, { 0x80000000 | 8, 21 },
+        }}),
+        // Slot 'onMoveReceived'
+        QtMocHelpers::SlotData<void(const Move &, PieceType)>(22, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 23, 24 }, { 0x80000000 | 25, 26 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -107,6 +135,11 @@ void gamewindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->onBackToMenuClicked(); break;
         case 6: _t->onPrevMoveClicked(); break;
         case 7: _t->onNextMoveClicked(); break;
+        case 8: _t->onConnected(); break;
+        case 9: _t->onDisconnected(); break;
+        case 10: _t->onNetworkError((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 11: _t->onGameStartReceived((*reinterpret_cast< std::add_pointer_t<std::array<Piece,64>>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<PieceColor>>(_a[2]))); break;
+        case 12: _t->onMoveReceived((*reinterpret_cast< std::add_pointer_t<Move>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<PieceType>>(_a[2]))); break;
         default: ;
         }
     }
@@ -135,14 +168,14 @@ int gamewindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 13)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 13;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 8)
+        if (_id < 13)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 8;
+        _id -= 13;
     }
     return _id;
 }
