@@ -195,9 +195,9 @@ void gamewindow::handleCellClick(int row, int col) {
         return;
     }
 
-    // --- Логика двух кликов: "откуда" -> "куда" ---
+    // Логика двух кликов
 
-    // Этап 1: Фигура еще не выбрана.
+    // Фигура еще не выбрана.
     if (m_selectedRow == -1) {
         // Пытаемся выбрать фигуру, если на клетке есть фигура текущего игрока.
         if (m_logic->getPieceAt(row, col).color == m_logic->getCurrentTurn()) {
@@ -207,7 +207,7 @@ void gamewindow::handleCellClick(int row, int col) {
             highlightValidMoves(); // Показываем возможные ходы.
         }
     }
-    // Этап 2: Фигура уже выбрана, это второй клик.
+    // Фигура уже выбрана, это второй клик.
     else {
         // Формирование простой алгебраической нотации для истории.
         QString notation = "";

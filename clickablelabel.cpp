@@ -1,5 +1,4 @@
-// clickablelabel.cpp
-// Реализация кастомного виджета QLabel.
+
 
 #include "clickablelabel.h"
 

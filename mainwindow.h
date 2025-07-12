@@ -1,6 +1,3 @@
-// mainwindow.h
-// Главное меню приложения.
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -13,13 +10,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-/**
- * @class MainWindow
- * @brief Стартовое окно (главное меню).
- *
- * Предоставляет навигацию: запуск игры, открытие справки, выход.
- * Управляет жизненным циклом окон gamewindow и guidewindow.
- */
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -45,4 +36,4 @@ private:
     guidewindow* guide_w = nullptr;
     gamewindow *game_w = nullptr;
 };
-#endif // MAINWINDOW_H
+#endif

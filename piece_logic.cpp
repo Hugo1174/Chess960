@@ -1,5 +1,3 @@
-// piece_logic.cpp
-// Реализация ядра игровой логики.
 
 #include "piece_logic.h"
 #include <QRandomGenerator>
@@ -41,7 +39,7 @@ void PieceLogic::setupNewGame() {
 }
 
 void PieceLogic::generateChess960Position() {
-    // Алгоритм генерации позиции по правилам Шахмат-960.
+    // Алгоритм генерации позиции
     std::vector<PieceType> back_rank(8);
     std::vector<int> empty_squares;
     for(int i=0; i<8; ++i) empty_squares.push_back(i);
@@ -225,7 +223,7 @@ bool PieceLogic::isPawnMoveValid(const Piece board[8][8], const Move& move) cons
 }
 
 bool PieceLogic::isKnightMoveValid(const Move& move) const {
-    // "Г-образный" ход: 2 клетки в одном направлении, 1 в перпендикулярном.
+    // Ход коня - 2 клетки в одном направлении, 1 в перпендикулярном.
     return (std::abs(move.fromRow - move.toRow) == 2 && std::abs(move.fromCol - move.toCol) == 1) ||
            (std::abs(move.fromRow - move.toRow) == 1 && std::abs(move.fromCol - move.toCol) == 2);
 }
@@ -235,7 +233,7 @@ bool PieceLogic::isKingMoveValid(const Piece board[8][8], PieceColor turn, const
     int dc = std::abs(move.fromCol - move.toCol);
     if (dr <= 1 && dc <= 1) return true; // Обычный ход на 1 клетку.
 
-    // --- Проверка рокировки (Chess960) ---
+    // Проверка рокировки
     // Рокировка - это ход короля на поле g1/c1 (g8/c8).
     if (dr == 0 && (move.toCol == 2 || move.toCol == 6)) {
         int homeRow = (turn == WHITE) ? 7 : 0;
@@ -252,7 +250,6 @@ bool PieceLogic::isKingMoveValid(const Piece board[8][8], PieceColor turn, const
         int rookFinalCol = isShortCastle ? 5 : 3;
 
         // 3. Все клетки между королем и ладьей (включительно, кроме их самих) должны быть пустыми.
-        // Это Chess960-специфичное правило, здесь оно упрощено до проверки пути короля и ладьи.
         for (int c = std::min(kingInitialCol, move.toCol) + 1; c < std::max(kingInitialCol, move.toCol); ++c) {
             if (board[homeRow][c].type != NONE) return false;
         }

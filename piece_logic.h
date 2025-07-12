@@ -1,6 +1,3 @@
-// piece_logic.h
-// Определяет ядро игровой логики (Model).
-
 #ifndef PIECE_LOGIC_H
 #define PIECE_LOGIC_H
 
@@ -28,13 +25,7 @@ struct Move {
     int toRow, toCol;
 };
 
-/**
- * @class PieceLogic
- * @brief Ядро игровой логики (Model).
- *
- * Управляет состоянием доски, правилами игры (включая Chess960),
- * проверкой ходов, историей партии. Полностью независим от UI.
- */
+
 class PieceLogic : public QObject
 {
     Q_OBJECT
@@ -109,4 +100,4 @@ private:
     bool isSlidingMoveValid(const Piece board[8][8], const Move& move, std::initializer_list<std::pair<int, int>> directions) const;
 };
 
-#endif // PIECE_LOGIC_H
+#endif

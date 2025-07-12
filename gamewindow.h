@@ -1,6 +1,3 @@
-// gamewindow.h
-// Определяет главное игровое окно.
-
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
@@ -12,13 +9,6 @@
 
 class QPushButton;
 
-/**
- * @class gamewindow
- * @brief Основное окно игры. Выступает в роли View и Controller.
- *
- * Отображает игровое поле, обрабатывает ввод пользователя (клики),
- * и взаимодействует с классом игровой логики (PieceLogic).
- */
 class gamewindow : public QMainWindow
 {
     Q_OBJECT
@@ -83,4 +73,4 @@ private:
     QString getPieceImagePath(const Piece& piece);
 };
 
-#endif // GAMEWINDOW_H
+#endif

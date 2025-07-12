@@ -1,5 +1,3 @@
-// promotiondialog.cpp
-// Реализация диалога выбора фигуры.
 
 #include "promotiondialog.h"
 #include <QPushButton>
