@@ -1,6 +1,8 @@
-QT       += core gui
+QT       += core gui network widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+# greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+# Выше я объединил widgets с основной строкой для большей ясности.
+# Это стандартная практика.
 
 CONFIG += c++17
 
@@ -9,6 +11,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
+    NetworkDialog.h \
     clickablelabel.h \
     gamewindow.h \
     guidewindow.h \
@@ -17,6 +20,7 @@ HEADERS += \
     promotiondialog.h \
     piece_logic.h
 SOURCES += \
+    NetworkDialog.cpp \
     clickablelabel.cpp \
     gamewindow.cpp \
     guidewindow.cpp \
@@ -27,6 +31,7 @@ SOURCES += \
     piece_logic.cpp
 
 FORMS += \
+    NetworkDialog.ui \
     gamewindow.ui \
     guidewindow.ui \
     mainwindow.ui

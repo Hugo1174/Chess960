@@ -1,3 +1,4 @@
+debug/NetworkDialog.o
 debug/clickablelabel.o
 debug/gamewindow.o
 debug/guidewindow.o
@@ -8,6 +9,7 @@ debug/promotiondialog.o
 debug/piece_logic.o
 debug/qrc_guide_img.o
 debug/qrc_pieces.o
+debug/moc_NetworkDialog.o
 debug/moc_clickablelabel.o
 debug/moc_gamewindow.o
 debug/moc_guidewindow.o

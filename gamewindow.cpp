@@ -1,5 +1,3 @@
-// gamewindow.cpp
-
 #include "gamewindow.h"
 #include "promotiondialog.h"
 #include "networkhandler.h"

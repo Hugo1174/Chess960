@@ -1,3 +1,4 @@
+release/NetworkDialog.o
 release/clickablelabel.o
 release/gamewindow.o
 release/guidewindow.o
@@ -8,6 +9,7 @@ release/promotiondialog.o
 release/piece_logic.o
 release/qrc_guide_img.o
 release/qrc_pieces.o
+release/moc_NetworkDialog.o
 release/moc_clickablelabel.o
 release/moc_gamewindow.o
 release/moc_guidewindow.o

@@ -1,5 +1,3 @@
-// gamewindow.h
-
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 

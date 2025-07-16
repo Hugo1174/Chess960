@@ -1,4 +1,3 @@
-
 #include "networkhandler.h"
 #include <QHostAddress>
 #include <QJsonDocument>
@@ -120,6 +119,5 @@ void NetworkHandler::onReadyRead() {
             PieceColor myColor = (static_cast<PieceColor>(obj["host_color"].toInt()) == WHITE) ? BLACK : WHITE;
             emit gameStartReceived(board, myColor);
         }
-        // ... обработка других типов сообщений (resign, draw_offer)
     }
 }

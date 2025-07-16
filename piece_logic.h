@@ -37,6 +37,7 @@ public:
     void setupNewGame();
     bool tryMove(int fromRow, int fromCol, int toRow, int toCol);
     void promotePawn(int row, int col, PieceType newType);
+    void loadGame(const std::array<Piece, 64>& board, PieceColor startingTurn);
 
     // --- Методы для получения состояния игры (для UI) ---
     Piece getPieceAt(int row, int col) const;
@@ -45,6 +46,7 @@ public:
     const std::vector<Piece>& getCapturedPieces(PieceColor color) const;
     std::vector<Move> getValidMovesForPiece(int row, int col);
     bool isKingInCheck(PieceColor kingColor) const;
+    bool isMoveValid(const Move& move) const;
 
     // --- Методы для просмотра истории ---
     const Piece* browseHistory(int step); // Шаг: +1 (вперед), -1 (назад)

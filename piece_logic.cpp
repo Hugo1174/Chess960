@@ -202,6 +202,8 @@ void PieceLogic::loadGame(const std::array<Piece, 64>& board, PieceColor startin
     emit boardChanged();
 }
 
+
+
 bool PieceLogic::isMoveValid(const Piece board[8][8], PieceColor turn, const Move& move, bool checkKingSafety) const {
     Piece movingPiece = board[move.fromRow][move.fromCol];
     Piece targetPiece = board[move.toRow][move.toCol];
