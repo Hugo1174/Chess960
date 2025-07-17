@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network # network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,6 +13,7 @@ HEADERS += \
     gamewindow.h \
     guidewindow.h \
     mainwindow.h \
+    networksetupdialog.h \
     promotiondialog.h \
     piece_logic.h
 SOURCES += \
@@ -21,6 +22,7 @@ SOURCES += \
     guidewindow.cpp \
     main.cpp \
     mainwindow.cpp \
+    networksetupdialog.cpp \
     promotiondialog.cpp \
     piece_logic.cpp
 
