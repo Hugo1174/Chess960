@@ -1,6 +1,6 @@
 #include "gamewindow.h"
 #include "promotiondialog.h"
-#include "networkmanager.h" // <-- Важный include
+#include "networkmanager.h"
 
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -24,10 +24,13 @@ gamewindow::gamewindow(QWidget *parent)
     setPalette(pal);
 
     setupUI();
-    m_logic->setupNewGame();
 
+    // Сначала подключаем сигналы
     connect(m_logic, &PieceLogic::boardChanged, this, &gamewindow::onBoardChanged);
     connect(m_logic, &PieceLogic::promotionRequired, this, &gamewindow::handlePromotion);
+
+    // А потом инициализируем игру
+    m_logic->setupNewGame();
 
     updateBoardUI();
 }
@@ -36,9 +39,7 @@ gamewindow::gamewindow(QWidget *parent)
 gamewindow::gamewindow(NetworkManager *manager, const QString& initialLayout, PieceColor myColor, QWidget *parent)
     : QMainWindow(parent), m_logic(new PieceLogic(this)), m_networkManager(manager), m_isNetworkGame(true), m_myColor(myColor)
 {
-    // Устанавливаем родителя для NetworkManager, чтобы он удалялся вместе с окном
     m_networkManager->setParent(this);
-
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle("Chess960 - Сетевая игра");
     setMinimumSize(1280, 720);
@@ -49,19 +50,17 @@ gamewindow::gamewindow(NetworkManager *manager, const QString& initialLayout, Pi
     setPalette(pal);
 
     setupUI();
-    m_logic->setBoardFromLayout(initialLayout);
+    findChild<QPushButton*>("newGameButton")->setEnabled(false);
 
-    // Подключаем сигналы логики
+    // 1. Сначала подключаем все сигналы
     connect(m_logic, &PieceLogic::boardChanged, this, &gamewindow::onBoardChanged);
     connect(m_logic, &PieceLogic::promotionRequired, this, &gamewindow::handlePromotion);
-
-    // Подключаем СЕТЕВЫЕ сигналы
     connect(m_networkManager, &NetworkManager::moveReceived, this, &gamewindow::onMoveReceived);
     connect(m_networkManager, &NetworkManager::promotionChoiceReceived, this, &gamewindow::onPromotionReceived);
     connect(m_networkManager, &NetworkManager::opponentDisconnected, this, &gamewindow::onOpponentDisconnected);
 
-    // Блокируем кнопку "Новая игра" в сетевом режиме
-    findChild<QPushButton*>("newGameButton")->setEnabled(false);
+    // 2. И только потом устанавливаем доску, что вызовет сигнал boardChanged()
+    m_logic->setBoardFromLayout(initialLayout);
 }
 
 
@@ -77,7 +76,6 @@ void gamewindow::setupUI() {
     QPushButton* newGameButton = new QPushButton("Новая игра");
     newGameButton->setObjectName("newGameButton");
     QPushButton* backToMenuButton = new QPushButton("В меню");
-
 
     QString buttonStyle = R"(
         QPushButton {
@@ -161,11 +159,8 @@ void gamewindow::setupUI() {
     mainLayout->addWidget(m_moveHistory);
 }
 
-
-
 void gamewindow::handleCellClick(int row, int col)
 {
-    // В сетевой игре мы можем ходить только в свой ход и своими фигурами
     if (m_isNetworkGame && m_logic->getCurrentTurn() != m_myColor) {
         return;
     }
@@ -177,7 +172,6 @@ void gamewindow::handleCellClick(int row, int col)
         return;
     }
     if (m_selectedRow == -1) {
-        // Выбор своей фигуры
         if (m_logic->getPieceAt(row, col).color == m_logic->getCurrentTurn()) {
             m_selectedRow = row;
             m_selectedCol = col;
@@ -185,7 +179,6 @@ void gamewindow::handleCellClick(int row, int col)
             highlightValidMoves();
         }
     } else {
-        // Попытка хода
         Move currentMove = {m_selectedRow, m_selectedCol, row, col};
 
         QString notation = "";
@@ -203,7 +196,6 @@ void gamewindow::handleCellClick(int row, int col)
                 m_moveHistory->append(notation);
             }
 
-            // Если игра сетевая, отправляем ход оппоненту
             if (m_isNetworkGame) {
                 m_networkManager->sendMove(currentMove);
             }
@@ -220,7 +212,6 @@ void gamewindow::handleCellClick(int row, int col)
                 }
             }
         } else {
-            // Если ход не удался, просто сбрасываем выделение
             m_selectedRow = -1;
             m_selectedCol = -1;
             updateBoardUI();
@@ -228,10 +219,8 @@ void gamewindow::handleCellClick(int row, int col)
     }
 }
 
-
 void gamewindow::handlePromotion(int row, int col, PieceColor color)
 {
-    // Если это наш ход в сетевой игре, или это локальная игра
     if (!m_isNetworkGame || color == m_myColor) {
         PromotionDialog dialog(color, this);
         if (dialog.exec() == QDialog::Accepted) {
@@ -241,32 +230,42 @@ void gamewindow::handlePromotion(int row, int col, PieceColor color)
                 m_networkManager->sendPromotionChoice(selected);
             }
         } else {
-            // Если пользователь закрыл окно, превращаем в ферзя по умолчанию
             m_logic->promotePawn(row, col, QUEEN);
             if (m_isNetworkGame) {
                 m_networkManager->sendPromotionChoice(QUEEN);
             }
         }
     }
-
 }
-
 
 
 void gamewindow::onMoveReceived(const Move& move)
 {
-    // Получили ход от оппонента, применяем его к нашей логике
+    // Генерируем нотацию для хода оппонента
+    QString notation = "";
+    Piece movingPiece = m_logic->getPieceAt(move.fromRow, move.fromCol);
+    if (movingPiece.type != NONE) {
+        QString fromStr = QChar('a' + move.fromCol) + QString::number(8 - move.fromRow);
+        QString toStr = QChar('a' + move.toCol) + QString::number(8 - move.toRow);
+        QMap<PieceType, QString> pieceNames = { {PAWN, "Pawn"}, {KNIGHT, "Knight"}, {BISHOP, "Bishop"}, {ROOK, "Rook"}, {QUEEN, "Queen"}, {KING, "King"} };
+        QString colorStr = (movingPiece.color == WHITE) ? "White" : "Black";
+        notation = QString("%1-%2 (%3 %4)").arg(fromStr, toStr, colorStr, pieceNames[movingPiece.type]);
+    }
+    // Добавляем ее в историю
+    if (!notation.isEmpty()) {
+        m_moveHistory->append(notation);
+    }
+
+    // Применяем ход к нашей логике
     m_logic->tryMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 }
 
 void gamewindow::onPromotionReceived(PieceType type)
 {
-    // Получили выбор фигуры для превращения от оппонента
-    // Нам нужно найти пешку, которая ждет превращения
     int promotionRow = (m_logic->getCurrentTurn() == WHITE) ? 7 : 0;
     for(int col = 0; col < 8; ++col) {
         Piece p = m_logic->getPieceAt(promotionRow, col);
-        if (p.type == PAWN && p.color != m_logic->getCurrentTurn()) { // Пешка оппонента
+        if (p.type == PAWN && p.color != m_logic->getCurrentTurn()) {
             m_logic->promotePawn(promotionRow, col, type);
             break;
         }
@@ -276,10 +275,8 @@ void gamewindow::onPromotionReceived(PieceType type)
 void gamewindow::onOpponentDisconnected()
 {
     QMessageBox::warning(this, "Соединение разорвано", "Ваш оппонент отключился. Игра окончена.");
-    // Блокируем доску
     centralWidget()->setEnabled(false);
 }
-
 
 void gamewindow::onBoardChanged() {
     updateBoardUI(nullptr);
