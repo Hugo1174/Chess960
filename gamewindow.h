@@ -6,29 +6,40 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QGridLayout>
+
+// Предварительные объявления
 class QPushButton;
+class NetworkManager;
 
 class gamewindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
+    // Старый конструктор для локальной игры
     explicit gamewindow(QWidget *parent = nullptr);
+
+    // НОВЫЙ конструктор для сетевой игры
+    explicit gamewindow(NetworkManager *manager, const QString& initialLayout, PieceColor myColor, QWidget *parent = nullptr);
+
 
 signals:
     void menuRequested();
 
 private slots:
     void handleCellClick(int row, int col);
-
-    // ИСПРАВЛЕНИЕ 2: Разделяем слоты
-    void onBoardChanged(); // Новый слот-прослойка
-
+    void onBoardChanged();
     void handlePromotion(int row, int col, PieceColor color);
     void onNewGameClicked();
     void onBackToMenuClicked();
     void onPrevMoveClicked();
     void onNextMoveClicked();
+
+    // НОВЫЕ слоты для обработки сетевых событий
+    void onMoveReceived(const Move& move);
+    void onPromotionReceived(PieceType type);
+    void onOpponentDisconnected();
+
 
 private:
     // UI Элементы
@@ -39,16 +50,19 @@ private:
     QPushButton* m_prevMoveButton;
     QPushButton* m_nextMoveButton;
 
-    // Указатель на логику игры
+    // Указатели на логику и сеть
     PieceLogic* m_logic;
+    NetworkManager* m_networkManager = nullptr;
 
-    // Внутреннее состояние UI
+    // Состояние UI и игры
     int m_selectedRow = -1;
     int m_selectedCol = -1;
+    bool m_isNetworkGame = false;
+    PieceColor m_myColor;
 
     // Приватные методы для UI
     void setupUI();
-    void updateBoardUI(const Piece* boardState = nullptr); // Этот метод остается без изменений
+    void updateBoardUI(const Piece* boardState = nullptr);
     void highlightValidMoves();
     void clearHighlights();
     void clearLayout(QLayout* layout);

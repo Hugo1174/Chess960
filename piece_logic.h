@@ -41,6 +41,7 @@ public:
     void setupNewGame();
     bool tryMove(int fromRow, int fromCol, int toRow, int toCol);
     void promotePawn(int row, int col, PieceType newType);
+    void setBoardFromLayout(const QString& layout);
 
     // --- Методы для получения состояния игры (для UI) ---
     Piece getPieceAt(int row, int col) const;

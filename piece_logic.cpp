@@ -306,6 +306,45 @@ void PieceLogic::updateGameStatus() {
         m_gameStatus = IN_PROGRESS;
     }
 }
+void PieceLogic::setBoardFromLayout(const QString& layout)
+{
+    // Очищаем старую историю и состояние
+    m_history.clear();
+    m_whiteCaptured.clear();
+    m_blackCaptured.clear();
+    m_gameStatus = IN_PROGRESS;
+    m_currentTurn = WHITE; // Игра всегда начинается с хода белых
+
+    // Разбираем строку, полученную по сети
+    QStringList pairs = layout.split(';', Qt::SkipEmptyParts);
+    if (pairs.size() != 64) {
+        // Ошибка в полученных данных, лучше вернуться к стандартной позиции
+        setupNewGame();
+        return;
+    }
+
+    std::array<Piece, 64> initialBoard;
+    int index = 0;
+    for (const QString& pair : pairs) {
+        QStringList parts = pair.split(',');
+        if (parts.size() == 2) {
+            Piece p;
+            p.type = static_cast<PieceType>(parts[0].toInt());
+            p.color = static_cast<PieceColor>(parts[1].toInt());
+            m_board[index / 8][index % 8] = p;
+            initialBoard[index] = p;
+        }
+        index++;
+    }
+
+    // Сохраняем начальную позицию в истории
+    m_history.push_back(initialBoard);
+    resetHistoryBrowser();
+
+    // Сообщаем UI, что доска изменилась
+    emit boardChanged();
+}
+
 bool PieceLogic::isKingInCheck(PieceColor kingColor) const { return isKingInCheck(m_board, kingColor); }
 Piece PieceLogic::getPieceAt(int row, int col) const { return m_board[row][col]; }
 PieceColor PieceLogic::getCurrentTurn() const { return m_currentTurn; }

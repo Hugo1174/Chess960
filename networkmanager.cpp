@@ -73,7 +73,6 @@ void NetworkManager::onReadyRead()
             break;
         }
             // default:
-            // Неизвестный тип сообщения, можно проигнорировать или записать в лог
         }
     }
 }

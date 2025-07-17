@@ -3,6 +3,7 @@
 
 #include "guidewindow.h"
 #include "gamewindow.h"
+#include "networkmanager.h"
 
 #include <QMainWindow>
 
