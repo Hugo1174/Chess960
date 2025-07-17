@@ -52,7 +52,14 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         "onNewGameClicked",
         "onBackToMenuClicked",
         "onPrevMoveClicked",
-        "onNextMoveClicked"
+        "onNextMoveClicked",
+        "onMoveReceived",
+        "Move",
+        "move",
+        "onPromotionReceived",
+        "PieceType",
+        "type",
+        "onOpponentDisconnected"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -76,6 +83,16 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onNextMoveClicked'
         QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onMoveReceived'
+        QtMocHelpers::SlotData<void(const Move &)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 15, 16 },
+        }}),
+        // Slot 'onPromotionReceived'
+        QtMocHelpers::SlotData<void(PieceType)>(17, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 18, 19 },
+        }}),
+        // Slot 'onOpponentDisconnected'
+        QtMocHelpers::SlotData<void()>(20, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -107,6 +124,9 @@ void gamewindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->onBackToMenuClicked(); break;
         case 6: _t->onPrevMoveClicked(); break;
         case 7: _t->onNextMoveClicked(); break;
+        case 8: _t->onMoveReceived((*reinterpret_cast< std::add_pointer_t<Move>>(_a[1]))); break;
+        case 9: _t->onPromotionReceived((*reinterpret_cast< std::add_pointer_t<PieceType>>(_a[1]))); break;
+        case 10: _t->onOpponentDisconnected(); break;
         default: ;
         }
     }
@@ -135,14 +155,14 @@ int gamewindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 11;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 8)
+        if (_id < 11)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 8;
+        _id -= 11;
     }
     return _id;
 }
