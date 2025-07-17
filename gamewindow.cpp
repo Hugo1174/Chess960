@@ -260,14 +260,20 @@ void gamewindow::onMoveReceived(const Move& move)
     m_logic->tryMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 }
 
+
 void gamewindow::onPromotionReceived(PieceType type)
 {
-    int promotionRow = (m_logic->getCurrentTurn() == WHITE) ? 7 : 0;
-    for(int col = 0; col < 8; ++col) {
+
+    PieceColor promoterColor = m_logic->getCurrentTurn();
+    int promotionRow = (promoterColor == WHITE) ? 0 : 7;
+
+    // Ищем пешку оппонента на линии превращения, чтобы передать ее координаты в promotePawn
+    for (int col = 0; col < 8; ++col) {
         Piece p = m_logic->getPieceAt(promotionRow, col);
-        if (p.type == PAWN && p.color != m_logic->getCurrentTurn()) {
+        // Мы ищем пешку цвета игрока, чей сейчас ход (т.е. оппонента)
+        if (p.type == PAWN && p.color == promoterColor) {
             m_logic->promotePawn(promotionRow, col, type);
-            break;
+            break; // Нашли и обработали, выходим из цикла
         }
     }
 }

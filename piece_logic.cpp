@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
+#include <QTextStream>
 
-// Вспомогательная функция для проверки, находится ли ход в пределах доски
 bool isWithinBoard(int r, int c) {
     return r >= 0 && r < 8 && c >= 0 && c < 8;
 }
@@ -31,6 +31,7 @@ void PieceLogic::setupNewGame() {
     resetHistoryBrowser();
     emit boardChanged();
 }
+
 
 void PieceLogic::generateChess960Position() {
     std::vector<PieceType> back_rank(8);
@@ -67,17 +68,49 @@ void PieceLogic::generateChess960Position() {
     }
 }
 
+
+void PieceLogic::setBoardFromLayout(const QString& layout)
+{
+    m_history.clear();
+    m_whiteCaptured.clear();
+    m_blackCaptured.clear();
+    m_gameStatus = IN_PROGRESS;
+    m_currentTurn = WHITE;
+
+    QStringList pairs = layout.split(';', Qt::SkipEmptyParts);
+    if (pairs.size() != 64) {
+        setupNewGame();
+        return;
+    }
+    std::array<Piece, 64> initialBoard;
+    int index = 0;
+    for (const QString& pair : pairs) {
+        QStringList parts = pair.split(',');
+        if (parts.size() == 2) {
+            Piece p;
+            p.type = static_cast<PieceType>(parts[0].toInt());
+            p.color = static_cast<PieceColor>(parts[1].toInt());
+            m_board[index / 8][index % 8] = p;
+            initialBoard[index] = p;
+        }
+        index++;
+    }
+    m_history.push_back(initialBoard);
+    resetHistoryBrowser();
+    emit boardChanged();
+}
+
+
 bool PieceLogic::tryMove(int fromRow, int fromCol, int toRow, int toCol) {
     if (m_gameStatus != IN_PROGRESS) return false;
     Move move = {fromRow, fromCol, toRow, toCol};
     if (!isMoveValid(m_board, m_currentTurn, move)) return false;
 
+
     std::array<Piece, 64> newBoardState;
     std::copy(&m_board[0][0], &m_board[0][0] + 64, newBoardState.begin());
-
     Piece movingPiece = newBoardState[fromRow * 8 + fromCol];
     Piece targetPiece = newBoardState[toRow * 8 + toCol];
-
     if (movingPiece.type == PAWN && toRow == m_enPassantTargetSquare.first && toCol == m_enPassantTargetSquare.second) {
         int capturedPawnRow = (m_currentTurn == WHITE) ? toRow + 1 : toRow - 1;
         targetPiece = newBoardState[capturedPawnRow * 8 + toCol];
@@ -92,11 +125,8 @@ bool PieceLogic::tryMove(int fromRow, int fromCol, int toRow, int toCol) {
         if (fromCol == m_rookInitialCols[m_currentTurn][0]) m_castlingRights[m_currentTurn][0] = false;
         if (fromCol == m_rookInitialCols[m_currentTurn][1]) m_castlingRights[m_currentTurn][1] = false;
     }
-
     newBoardState[toRow * 8 + toCol] = newBoardState[fromRow * 8 + fromCol];
     newBoardState[fromRow * 8 + fromCol] = {NONE, NO_COLOR};
-
-    // Перемещение ладьи при рокировке
     if (movingPiece.type == KING && std::abs(fromCol - toCol) > 1) {
         bool isShortCastle = toCol == 6;
         int rookInitialCol = m_rookInitialCols[m_currentTurn][isShortCastle ? 1 : 0];
@@ -104,37 +134,42 @@ bool PieceLogic::tryMove(int fromRow, int fromCol, int toRow, int toCol) {
         newBoardState[fromRow * 8 + rookFinalCol] = newBoardState[fromRow * 8 + rookInitialCol];
         newBoardState[fromRow * 8 + rookInitialCol] = {NONE, NO_COLOR};
     }
-
     std::copy(&newBoardState[0], &newBoardState[0] + 64, &m_board[0][0]);
-
     m_enPassantTargetSquare = {-1, -1};
     if (movingPiece.type == PAWN && std::abs(fromRow - toRow) == 2) {
         m_enPassantTargetSquare = { (fromRow + toRow) / 2, fromCol };
     }
     m_lastMove = move;
-
     m_history.push_back(newBoardState);
     resetHistoryBrowser();
 
     if (movingPiece.type == PAWN && (toRow == 0 || toRow == 7)) {
         emit promotionRequired(toRow, toCol, movingPiece.color);
     } else {
+        // Если это обычный ход, завершаем его немедленно
         switchTurn();
         updateGameStatus();
     }
+
     emit boardChanged();
     return true;
 }
 
+
 void PieceLogic::promotePawn(int row, int col, PieceType newType) {
     if (m_board[row][col].type == PAWN) {
         m_board[row][col].type = newType;
+
+
         std::copy(&m_board[0][0], &m_board[0][0] + 64, m_history.back().begin());
+
+
         switchTurn();
         updateGameStatus();
         emit boardChanged();
     }
 }
+
 
 bool PieceLogic::isMoveValid(const Piece board[8][8], PieceColor turn, const Move& move, bool checkKingSafety) const {
     Piece movingPiece = board[move.fromRow][move.fromCol];
@@ -156,14 +191,12 @@ bool PieceLogic::isMoveValid(const Piece board[8][8], PieceColor turn, const Mov
     if (checkKingSafety) {
         Piece tempBoard[8][8];
         std::copy(&board[0][0], &board[0][0] + 64, &tempBoard[0][0]);
-        // Симулируем ход для проверки на шах
         tempBoard[move.toRow][move.toCol] = tempBoard[move.fromRow][move.fromCol];
         tempBoard[move.fromRow][move.fromCol] = {NONE, NO_COLOR};
         if (isKingInCheck(tempBoard, turn)) return false;
     }
     return true;
 }
-
 bool PieceLogic::isPawnMoveValid(const Piece board[8][8], const Move& move) const {
     Piece movingPiece = board[move.fromRow][move.fromCol];
     Piece targetPiece = board[move.toRow][move.toCol];
@@ -179,55 +212,37 @@ bool PieceLogic::isPawnMoveValid(const Piece board[8][8], const Move& move) cons
     }
     return false;
 }
-
 bool PieceLogic::isKnightMoveValid(const Move& move) const {
     return (std::abs(move.fromRow - move.toRow) == 2 && std::abs(move.fromCol - move.toCol) == 1) ||
            (std::abs(move.fromRow - move.toRow) == 1 && std::abs(move.fromCol - move.toCol) == 2);
 }
-
-// ИСПРАВЛЕНИЕ 2: Полная реализация правил рокировки для Chess960
 bool PieceLogic::isKingMoveValid(const Piece board[8][8], PieceColor turn, const Move& move) const {
     int dr = std::abs(move.fromRow - move.toRow);
     int dc = std::abs(move.fromCol - move.toCol);
     if (dr <= 1 && dc <= 1) return true;
-
-    // Проверка, является ли ход попыткой рокировки
     if (dr == 0 && (move.toCol == 2 || move.toCol == 6)) {
         int homeRow = (turn == WHITE) ? 7 : 0;
-        // 1. Король должен быть на своей начальной клетке (в Chess960 это не так, он может двигаться по горизонтали и рокироваться)
-        // Но он не должен был ходить до этого! Мы это проверяем через m_castlingRights.
-        if (isKingInCheck(board, turn)) return false; // 2. Король не должен быть под шахом
-
+        if (isKingInCheck(board, turn)) return false;
         bool isShortCastle = move.toCol == 6;
         int castlingIndex = isShortCastle ? 1 : 0;
-
-        if (!m_castlingRights[turn][castlingIndex]) return false; // 3. Право на рокировку не утеряно
-
+        if (!m_castlingRights[turn][castlingIndex]) return false;
         int rookInitialCol = m_rookInitialCols[turn][castlingIndex];
         int kingInitialCol = m_kingInitialCol[turn];
-
-        // 4. Все клетки между начальной позицией короля и его конечной позицией (c1/g1) должны быть пустыми
         for (int c = std::min(kingInitialCol, move.toCol) + 1; c < std::max(kingInitialCol, move.toCol); ++c) {
             if (board[homeRow][c].type != NONE) return false;
         }
-
-        // 5. Все клетки между начальной позицией ладьи и ее конечной позицией (d1/f1) должны быть пустыми
         int rookFinalCol = isShortCastle ? 5 : 3;
         for (int c = std::min(rookInitialCol, rookFinalCol) + 1; c < std::max(rookInitialCol, rookFinalCol); ++c) {
             if (board[homeRow][c].type != NONE) return false;
         }
-
-        // 6. Король не должен проходить через битое поле
         PieceColor opponent = (turn == WHITE) ? BLACK : WHITE;
         for (int c = std::min(move.fromCol, move.toCol); c <= std::max(move.fromCol, move.toCol); ++c) {
             if (isSquareAttacked(board, homeRow, c, opponent)) return false;
         }
-
         return true;
     }
     return false;
 }
-
 bool PieceLogic::isSlidingMoveValid(const Piece board[8][8], const Move& move, std::initializer_list<std::pair<int, int>> directions) const {
     int dr = move.toRow - move.fromRow;
     int dc = move.toCol - move.fromCol;
@@ -245,7 +260,6 @@ bool PieceLogic::isSlidingMoveValid(const Piece board[8][8], const Move& move, s
     }
     return false;
 }
-
 bool PieceLogic::isKingInCheck(const Piece board[8][8], PieceColor kingColor) const {
     int kingRow = -1, kingCol = -1;
     for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
@@ -253,7 +267,6 @@ bool PieceLogic::isKingInCheck(const Piece board[8][8], PieceColor kingColor) co
         }
     return (kingRow != -1) && isSquareAttacked(board, kingRow, kingCol, (kingColor == WHITE) ? BLACK : WHITE);
 }
-
 bool PieceLogic::isSquareAttacked(const Piece board[8][8], int row, int col, PieceColor attackerColor) const {
     for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
             if (board[r][c].color == attackerColor) {
@@ -262,7 +275,6 @@ bool PieceLogic::isSquareAttacked(const Piece board[8][8], int row, int col, Pie
         }
     return false;
 }
-
 bool PieceLogic::hasLegalMoves(PieceColor color) {
     for (int r = 0; r < 8; ++r) for (int c = 0; c < 8; ++c) {
             if (m_board[r][c].color == color) {
@@ -271,7 +283,6 @@ bool PieceLogic::hasLegalMoves(PieceColor color) {
         }
     return false;
 }
-
 std::vector<Move> PieceLogic::getValidMovesForPiece(int row, int col) {
     std::vector<Move> validMoves;
     if (m_board[row][col].color != m_currentTurn) return validMoves;
@@ -281,7 +292,6 @@ std::vector<Move> PieceLogic::getValidMovesForPiece(int row, int col) {
         }
     return validMoves;
 }
-
 const Piece* PieceLogic::browseHistory(int step) {
     int newIndex = m_historyBrowserIndex + step;
     if (newIndex >= 0 && static_cast<size_t>(newIndex) < m_history.size()) {
@@ -290,14 +300,11 @@ const Piece* PieceLogic::browseHistory(int step) {
     }
     return nullptr;
 }
-
 void PieceLogic::resetHistoryBrowser() {
     m_historyBrowserIndex = m_history.empty() ? -1 : m_history.size() - 1;
 }
-
 int PieceLogic::getHistorySize() const { return m_history.size(); }
 int PieceLogic::getCurrentHistoryIndex() const { return m_historyBrowserIndex; }
-
 void PieceLogic::switchTurn() { m_currentTurn = (m_currentTurn == WHITE) ? BLACK : WHITE; }
 void PieceLogic::updateGameStatus() {
     if (!hasLegalMoves(m_currentTurn)) {
@@ -306,45 +313,6 @@ void PieceLogic::updateGameStatus() {
         m_gameStatus = IN_PROGRESS;
     }
 }
-void PieceLogic::setBoardFromLayout(const QString& layout)
-{
-    // Очищаем старую историю и состояние
-    m_history.clear();
-    m_whiteCaptured.clear();
-    m_blackCaptured.clear();
-    m_gameStatus = IN_PROGRESS;
-    m_currentTurn = WHITE; // Игра всегда начинается с хода белых
-
-    // Разбираем строку, полученную по сети
-    QStringList pairs = layout.split(';', Qt::SkipEmptyParts);
-    if (pairs.size() != 64) {
-        // Ошибка в полученных данных, лучше вернуться к стандартной позиции
-        setupNewGame();
-        return;
-    }
-
-    std::array<Piece, 64> initialBoard;
-    int index = 0;
-    for (const QString& pair : pairs) {
-        QStringList parts = pair.split(',');
-        if (parts.size() == 2) {
-            Piece p;
-            p.type = static_cast<PieceType>(parts[0].toInt());
-            p.color = static_cast<PieceColor>(parts[1].toInt());
-            m_board[index / 8][index % 8] = p;
-            initialBoard[index] = p;
-        }
-        index++;
-    }
-
-    // Сохраняем начальную позицию в истории
-    m_history.push_back(initialBoard);
-    resetHistoryBrowser();
-
-    // Сообщаем UI, что доска изменилась
-    emit boardChanged();
-}
-
 bool PieceLogic::isKingInCheck(PieceColor kingColor) const { return isKingInCheck(m_board, kingColor); }
 Piece PieceLogic::getPieceAt(int row, int col) const { return m_board[row][col]; }
 PieceColor PieceLogic::getCurrentTurn() const { return m_currentTurn; }
