@@ -52,7 +52,7 @@ void PieceLogic::generateChess960Position() {
     int rook1_pos_in_empty = QRandomGenerator::global()->bounded(king_pos_in_empty);
     int rook1_square = empty_squares[rook1_pos_in_empty];
     back_rank[rook1_square] = ROOK;
-    int rook2_pos_in_empty = king_pos_in_empty + 1 + QRandomGenerator::global()->bounded(empty_squares.size() - (king_pos_in_empty + 1));
+    int rook2_pos_in_empty = king_pos_in_empty + 1 + QRandomGenerator::global()->bounded(static_cast<int>(empty_squares.size() - (king_pos_in_empty + 1)));
     int rook2_square = empty_squares[rook2_pos_in_empty];
     back_rank[rook2_square] = ROOK;
     m_kingInitialCol[WHITE] = m_kingInitialCol[BLACK] = king_square;

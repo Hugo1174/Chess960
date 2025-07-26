@@ -1,51 +1,26 @@
-# First Level Heading
+# Chess960 (Шахматы Фишера)
 
-Paragraph.
+Проект реализации классических и сетевых шахмат Фишера (Chess960) с графическим интерфейсом.
 
-## Second Level Heading
+## Особенности
+- 🔄 Случайная начальная расстановка по правилам Chess960
+- 🖥️ Локальная игра на одной доске
+- 🌐 P2P-игра по сети
+- 📚 Раздел с информацией о шахматах Фишера
+- 🎮 Простой и интуитивный интерфейс
 
-Paragraph.
+## Что такое шахматы Фишера?
+Шахматы Фишера (Chess960) - вариант шахмат с случайной начальной расстановкой фигур на последней горизонтали. Всего возможно 960 различных стартовых позиций, что исключает запоминание дебютов и делает игру более творческой.
 
-- bullet
-+ other bullet
-* another bullet
-    * child bullet
+## Запуск приложения
 
-1. ordered
-2. next ordered
+### Основной способ на Windows и Linux (Ubuntu)
+1. Перейдите в директорию сборки: ...\Chess960\build\Desktop_Qt_6_9_0_MinGW_64_bit-Release\release
+2. Запустите файл `Chess960.exe`
 
-### Third Level Heading
+### Альтернативные способы на Windows и Linux (Ubuntu)
+**Через Qt Creator:**
+1. Откройте проект в Qt Creator
+2. Выберите комплект сборки Qt 6.9.0 MinGW 64-bit
+3. Нажмите "Запустить"
 
-Some *italic* and **bold** text and `inline code`.
-
-An empty line starts a new paragraph.
-
-Use two spaces at the end  
-to force a line break.
-
-A horizontal ruler follows:
-
----
-
-Add links inline like [this link to the Qt homepage](https://www.qt.io),
-or with a reference like [this other link to the Qt homepage][1].
-
-    Add code blocks with
-    four spaces at the front.
-
-> A blockquote
-> starts with >
->
-> and has the same paragraph rules as normal text.
-
-First Level Heading in Alternate Style
-======================================
-
-Paragraph.
-
-Second Level Heading in Alternate Style
----------------------------------------
-
-Paragraph.
-
-[1]: https://www.qt.io
