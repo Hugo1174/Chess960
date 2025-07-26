@@ -88,7 +88,7 @@ OBJECTS       = debug/clickablelabel.o \
 		debug/moc_promotiondialog.o \
 		debug/moc_piece_logic.o
 
-DIST          =  ..\..\clickablelabel.h \
+DIST          = README.md ..\..\clickablelabel.h \
 		..\..\gamewindow.h \
 		..\..\guidewindow.h \
 		..\..\mainwindow.h \

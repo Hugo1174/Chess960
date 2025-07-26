@@ -88,7 +88,7 @@ OBJECTS       = release/clickablelabel.o \
 		release/moc_promotiondialog.o \
 		release/moc_piece_logic.o
 
-DIST          =  ..\..\clickablelabel.h \
+DIST          = README.md ..\..\clickablelabel.h \
 		..\..\gamewindow.h \
 		..\..\guidewindow.h \
 		..\..\mainwindow.h \
