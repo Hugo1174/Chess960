@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>guide/shahmati-fishera.jpg</file>
+        <file>guide/fisher.jpg</file>
+        <file>guide/posle-rokirovki.jpg</file>
+        <file>guide/shahmati-fishera-turnir.jpg</file>
+        <file>guide/do-rokirovki.jpg</file>
+    </qresource>
+    <qresource prefix="/menu"/>
+</RCC>
