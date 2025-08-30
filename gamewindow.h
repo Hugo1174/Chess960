@@ -9,6 +9,7 @@
 
 // Предварительные объявления для уменьшения зависимостей в заголовках.
 class QPushButton;
+class QLineEdit;
 class NetworkManager;
 
 /**
@@ -48,6 +49,10 @@ private slots:
     void onMoveReceived(const Move& move);
     void onOpponentDisconnected();
 
+    // Чат: приём и отправка
+    void onChatReceived(const QString &message);
+    void onSendChatClicked();
+
 private:
     // UI Элементы
     ClickableLabel* m_boardCells[8][8];       // Сетка интерактивных клеток доски.
@@ -56,6 +61,11 @@ private:
     QGridLayout* m_blackCapturedLayout;       // Layout для съеденных черных фигур.
     QPushButton* m_prevMoveButton;            // Кнопка "<" для истории.
     QPushButton* m_nextMoveButton;            // Кнопка ">" для истории.
+
+    // Элементы чата (ТОЛЬКО для сетевой игры; в локальном режиме не используются/скрыты)
+    QTextEdit* m_chatHistory = nullptr;       // История переписки (read-only).
+    QLineEdit* m_chatInput = nullptr;         // Поле ввода.
+    QPushButton* m_sendChatButton = nullptr;  // Кнопка "Отправить".
 
     // Указатели на другие модули
     PieceLogic* m_logic;                      // Указатель на игровую логику (Модель).

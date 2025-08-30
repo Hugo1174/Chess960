@@ -11,7 +11,7 @@ class QTcpSocket;
  * @brief Инкапсулирует весь сетевой протокол игры.
  *
  * Отвечает за сериализацию, отправку, получение и десериализацию
- * игровых данных (ходов) через TCP сокет.
+ * игровых данных (ходов) через TCP сокет, а также обмен сообщениями чата.
  */
 class NetworkManager : public QObject
 {
@@ -24,11 +24,16 @@ public:
     // Отправляет ход (включая информацию о превращении) оппоненту.
     void sendMove(const Move& move);
 
+    // Отправляет текстовое сообщение чата оппоненту.
+    void sendChatMessage(const QString &message);
+
 signals:
     // Сигнал, испускаемый при получении хода от оппонента.
     void moveReceived(const Move& move);
     // Сигнал о разрыве соединения.
     void opponentDisconnected();
+    // Сигнал при получении сообщения чата.
+    void chatReceived(const QString &message);
 
 private slots:
     // Внутренние слоты для обработки событий сокета.
@@ -40,7 +45,8 @@ private:
 
     // Простой бинарный протокол.
     enum MessageType : quint8 {
-        MsgMove // Единственный тип сообщения - ход.
+        MsgMove = 0,   // Ход.
+        MsgChat = 1    // Сообщение чата (QString).
     };
 };
 

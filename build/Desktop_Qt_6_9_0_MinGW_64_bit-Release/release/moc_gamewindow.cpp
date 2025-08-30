@@ -53,7 +53,10 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         "onMoveReceived",
         "Move",
         "move",
-        "onOpponentDisconnected"
+        "onOpponentDisconnected",
+        "onChatReceived",
+        "message",
+        "onSendChatClicked"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -79,6 +82,12 @@ template <> constexpr inline auto gamewindow::qt_create_metaobjectdata<qt_meta_t
         }}),
         // Slot 'onOpponentDisconnected'
         QtMocHelpers::SlotData<void()>(14, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onChatReceived'
+        QtMocHelpers::SlotData<void(const QString &)>(15, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { QMetaType::QString, 16 },
+        }}),
+        // Slot 'onSendChatClicked'
+        QtMocHelpers::SlotData<void()>(17, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -111,6 +120,8 @@ void gamewindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->onBoardChanged(); break;
         case 7: _t->onMoveReceived((*reinterpret_cast< std::add_pointer_t<Move>>(_a[1]))); break;
         case 8: _t->onOpponentDisconnected(); break;
+        case 9: _t->onChatReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 10: _t->onSendChatClicked(); break;
         default: ;
         }
     }
@@ -139,14 +150,14 @@ int gamewindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 11)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 11;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 9)
+        if (_id < 11)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 9;
+        _id -= 11;
     }
     return _id;
 }

@@ -44,6 +44,8 @@ template <> constexpr inline auto NetworkManager::qt_create_metaobjectdata<qt_me
         "Move",
         "move",
         "opponentDisconnected",
+        "chatReceived",
+        "message",
         "onReadyRead",
         "onSocketStateChanged"
     };
@@ -55,10 +57,14 @@ template <> constexpr inline auto NetworkManager::qt_create_metaobjectdata<qt_me
         }}),
         // Signal 'opponentDisconnected'
         QtMocHelpers::SignalData<void()>(5, 2, QMC::AccessPublic, QMetaType::Void),
+        // Signal 'chatReceived'
+        QtMocHelpers::SignalData<void(const QString &)>(6, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::QString, 7 },
+        }}),
         // Slot 'onReadyRead'
-        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onSocketStateChanged'
-        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -84,8 +90,9 @@ void NetworkManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         switch (_id) {
         case 0: _t->moveReceived((*reinterpret_cast< std::add_pointer_t<Move>>(_a[1]))); break;
         case 1: _t->opponentDisconnected(); break;
-        case 2: _t->onReadyRead(); break;
-        case 3: _t->onSocketStateChanged(); break;
+        case 2: _t->chatReceived((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 3: _t->onReadyRead(); break;
+        case 4: _t->onSocketStateChanged(); break;
         default: ;
         }
     }
@@ -93,6 +100,8 @@ void NetworkManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         if (QtMocHelpers::indexOfMethod<void (NetworkManager::*)(const Move & )>(_a, &NetworkManager::moveReceived, 0))
             return;
         if (QtMocHelpers::indexOfMethod<void (NetworkManager::*)()>(_a, &NetworkManager::opponentDisconnected, 1))
+            return;
+        if (QtMocHelpers::indexOfMethod<void (NetworkManager::*)(const QString & )>(_a, &NetworkManager::chatReceived, 2))
             return;
     }
 }
@@ -116,14 +125,14 @@ int NetworkManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 5)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }
@@ -138,5 +147,11 @@ void NetworkManager::moveReceived(const Move & _t1)
 void NetworkManager::opponentDisconnected()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, nullptr);
+}
+
+// SIGNAL 2
+void NetworkManager::chatReceived(const QString & _t1)
+{
+    QMetaObject::activate<void>(this, &staticMetaObject, 2, nullptr, _t1);
 }
 QT_WARNING_POP

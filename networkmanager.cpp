@@ -31,6 +31,20 @@ void NetworkManager::sendMove(const Move& move)
     m_socket->write(block);
 }
 
+// Отправляет текстовое сообщение чата.
+void NetworkManager::sendChatMessage(const QString &message)
+{
+    if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState) return;
+
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_15);
+
+    out << static_cast<quint8>(MsgChat) << message;
+
+    m_socket->write(block);
+}
+
 // Вызывается, когда в сокет приходят данные.
 void NetworkManager::onReadyRead()
 {
@@ -38,7 +52,7 @@ void NetworkManager::onReadyRead()
     in.setVersion(QDataStream::Qt_5_15);
 
     // Цикл на случай, если пришло несколько сообщений сразу.
-    while(!in.atEnd()) {
+    while (!in.atEnd()) {
         quint8 msgTypeRaw;
         in >> msgTypeRaw;
         MessageType msgType = static_cast<MessageType>(msgTypeRaw);
@@ -53,6 +67,13 @@ void NetworkManager::onReadyRead()
                                  static_cast<PieceType>(promotionPiece)};
             // Уведомляем остальную часть программы о полученном ходе.
             emit moveReceived(receivedMove);
+        } else if (msgType == MsgChat) {
+            QString text;
+            in >> text;
+            emit chatReceived(text);
+        } else {
+            // Неизвестный тип — прекращаем чтение, чтобы не «сломать» поток.
+            break;
         }
     }
 }

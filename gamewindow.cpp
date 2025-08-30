@@ -9,6 +9,8 @@
 #include <QMap>
 #include <QFont>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QLabel>
 
 // Конструктор для локальной игры.
 gamewindow::gamewindow(QWidget *parent)
@@ -53,6 +55,15 @@ gamewindow::gamewindow(NetworkManager *manager, const QString& initialLayout, Pi
     connect(m_networkManager, &NetworkManager::moveReceived, this, &gamewindow::onMoveReceived);
     connect(m_networkManager, &NetworkManager::opponentDisconnected, this, &gamewindow::onOpponentDisconnected);
 
+    // Подписка на чат и обработчики отправки
+    connect(m_networkManager, &NetworkManager::chatReceived, this, &gamewindow::onChatReceived);
+    if (m_sendChatButton) {
+        connect(m_sendChatButton, &QPushButton::clicked, this, &gamewindow::onSendChatClicked);
+    }
+    if (m_chatInput) {
+        connect(m_chatInput, &QLineEdit::returnPressed, this, &gamewindow::onSendChatClicked);
+    }
+
     m_logic->setBoardFromLayout(initialLayout);
 }
 
@@ -62,6 +73,7 @@ void gamewindow::setupUI() {
     setCentralWidget(centralWidget);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
 
+    // ==== ЛЕВАЯ ПАНЕЛЬ ====
     QVBoxLayout *leftPanelLayout = new QVBoxLayout();
     QWidget* leftPanelWidget = new QWidget();
 
@@ -88,38 +100,50 @@ void gamewindow::setupUI() {
     buttonsLayout->addWidget(backToMenuButton);
     leftPanelLayout->addLayout(buttonsLayout);
     leftPanelLayout->addSpacing(20);
+
     QLabel* blackCapturedLabel = new QLabel("Съеденные (Черные)");
     blackCapturedLabel->setStyleSheet("color: white; font-weight: bold;");
     leftPanelLayout->addWidget(blackCapturedLabel);
+
     m_blackCapturedLayout = new QGridLayout();
     m_blackCapturedLayout->setSpacing(5);
     leftPanelLayout->addLayout(m_blackCapturedLayout);
     leftPanelLayout->addStretch(1);
+
     QLabel* whiteCapturedLabel = new QLabel("Съеденные (Белые)");
     whiteCapturedLabel->setStyleSheet("color: white; font-weight: bold;");
     leftPanelLayout->addWidget(whiteCapturedLabel);
+
     m_whiteCapturedLayout = new QGridLayout();
     m_whiteCapturedLayout->setSpacing(5);
     leftPanelLayout->addLayout(m_whiteCapturedLayout);
     leftPanelLayout->addStretch(1);
+
     QHBoxLayout* historyButtonsLayout = new QHBoxLayout();
     m_prevMoveButton = new QPushButton("<");
     m_nextMoveButton = new QPushButton(">");
+
     QString historyButtonStyle = buttonStyle + "font-size: 18px;";
     m_prevMoveButton->setFixedSize(40, 40);
     m_nextMoveButton->setFixedSize(40, 40);
     m_prevMoveButton->setStyleSheet(historyButtonStyle);
     m_nextMoveButton->setStyleSheet(historyButtonStyle);
+
     connect(m_prevMoveButton, &QPushButton::clicked, this, &gamewindow::onPrevMoveClicked);
     connect(m_nextMoveButton, &QPushButton::clicked, this, &gamewindow::onNextMoveClicked);
+
     historyButtonsLayout->addStretch();
     historyButtonsLayout->addWidget(m_prevMoveButton);
     historyButtonsLayout->addWidget(m_nextMoveButton);
     historyButtonsLayout->addStretch();
+
     leftPanelLayout->addLayout(historyButtonsLayout);
     leftPanelWidget->setLayout(leftPanelLayout);
+
+    // ==== ДОСКА ====
     QGridLayout *boardLayout = new QGridLayout();
     boardLayout->setSpacing(0);
+
     for (int c = 0; c < 8; ++c) {
         QString letter = QChar('a' + c);
         QLabel* topLetter = new QLabel(letter); topLetter->setAlignment(Qt::AlignCenter); topLetter->setFixedSize(90, 30); topLetter->setStyleSheet("color: white; font-weight: bold;");
@@ -141,15 +165,60 @@ void gamewindow::setupUI() {
     QWidget* boardContainer = new QWidget();
     boardContainer->setLayout(boardLayout);
     boardContainer->setFixedSize(boardLayout->sizeHint());
+
+    // ==== ПРАВАЯ ПАНЕЛЬ (история ходов + чат (только сеть)) ====
+    QWidget* rightPanel = new QWidget();
+    QVBoxLayout* rightLayout = new QVBoxLayout(rightPanel);
+
     m_moveHistory = new QTextEdit();
     m_moveHistory->setReadOnly(true);
     m_moveHistory->setStyleSheet("background-color: #3c3c3c; color: white; border: 1px solid gray;");
-    m_moveHistory->setMinimumWidth(200);
+    m_moveHistory->setMinimumWidth(260);
+
+    rightLayout->addWidget(new QLabel("История ходов"));
+    static_cast<QLabel*>(rightLayout->itemAt(rightLayout->count()-1)->widget())->setStyleSheet("color: white; font-weight: bold;");
+    rightLayout->addWidget(m_moveHistory);
+
+    if (m_isNetworkGame) {
+        QLabel* chatLabel = new QLabel("Чат");
+        chatLabel->setStyleSheet("color: white; font-weight: bold;");
+        rightLayout->addWidget(chatLabel);
+
+        m_chatHistory = new QTextEdit();
+        m_chatHistory->setReadOnly(true);
+        m_chatHistory->setStyleSheet("background-color: #2f2f2f; color: white; border: 1px solid gray;");
+
+        rightLayout->addWidget(m_chatHistory, /*stretch*/1);
+
+        QHBoxLayout* chatInputLayout = new QHBoxLayout();
+        m_chatInput = new QLineEdit();
+        m_chatInput->setPlaceholderText("Напишите сообщение…");
+        m_sendChatButton = new QPushButton("Отправить");
+
+        QString sendBtnStyle = R"(
+            QPushButton {
+                background-color: #4a7bd1; color: white; border: 1px solid #3a6bbf;
+                padding: 6px 10px; font-weight: bold; border-radius: 4px;
+            }
+            QPushButton:hover { background-color: #5a8be1; }
+            QPushButton:pressed { background-color: #375ea3; }
+        )";
+        m_sendChatButton->setStyleSheet(sendBtnStyle);
+
+        chatInputLayout->addWidget(m_chatInput, 1);
+        chatInputLayout->addWidget(m_sendChatButton);
+
+        rightLayout->addLayout(chatInputLayout);
+    } else {
+        rightLayout->addStretch(1);
+    }
+
+    // ==== Сборка в главный лэйаут ====
     mainLayout->addWidget(leftPanelWidget);
     mainLayout->addStretch(1);
     mainLayout->addWidget(boardContainer);
     mainLayout->addStretch(1);
-    mainLayout->addWidget(m_moveHistory);
+    mainLayout->addWidget(rightPanel);
 }
 
 // Основной обработчик кликов по доске.
@@ -244,6 +313,27 @@ void gamewindow::onOpponentDisconnected()
         m_logic->forceEndGame();
     }
     // Если игра уже была завершена (мат/пат), ничего не делаем, чтобы избежать дублирующих сообщений.
+}
+
+// Приём входящих сообщений чата.
+void gamewindow::onChatReceived(const QString &message)
+{
+    if (m_chatHistory) {
+        m_chatHistory->append(QString("<b>Оппонент:</b> %1").arg(message.toHtmlEscaped()));
+    }
+}
+
+// Отправка сообщения чата.
+void gamewindow::onSendChatClicked()
+{
+    if (!m_isNetworkGame || !m_networkManager || !m_chatInput || !m_chatHistory) return;
+
+    const QString text = m_chatInput->text().trimmed();
+    if (text.isEmpty()) return;
+
+    m_networkManager->sendChatMessage(text);
+    m_chatHistory->append(QString("<b>Вы:</b> %1").arg(text.toHtmlEscaped()));
+    m_chatInput->clear();
 }
 
 // Централизованная проверка и отображение окончания игры.
