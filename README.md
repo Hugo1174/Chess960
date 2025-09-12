@@ -76,6 +76,14 @@ https://github.com/Hugo1174/Chess960.
 
 
 ---
+## Решение проблем
+Если возникает ошибка при запуске
+`The process failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program` 
+скорее всего это связяно с отсутствием прав на выполнение файла.
+Решение:
+ введите в терминале `chmod +x /Директория_проекта/Chess960-main/build/Desktop-Debug/Chess960`
+ 
+---
 
 ## Технологии
 
